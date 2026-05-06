@@ -3,12 +3,15 @@ import path from "node:path";
 import { chromium } from "@playwright/test";
 
 const appUrl = process.env.APP_URL ?? "http://127.0.0.1:3000";
-const outputDir = path.join(process.cwd(), "screenshots");
+const outputDir = process.env.SCREENSHOT_DIR
+  ? path.resolve(process.env.SCREENSHOT_DIR)
+  : path.join(process.cwd(), "screenshots");
 
 const viewports = [
   ["1920x1080", 1920, 1080],
   ["1600x900", 1600, 900],
   ["1366x768", 1366, 768],
+  ["1280x720", 1280, 720],
 ] as const;
 
 const screens = [
@@ -22,7 +25,7 @@ const screens = [
 async function verifyPage(page: import("@playwright/test").Page) {
   const result = await page.evaluate(() => {
     const headings = Array.from(document.querySelectorAll("h1, h2"));
-    const cards = Array.from(document.querySelectorAll(".kpiPanel, .servicePanel, .profileCard, .policyCard, .methodCard, .scopeCard, .sourceCard, .sensitivityCard"));
+    const cards = Array.from(document.querySelectorAll(".v2-card, .kpiPanel, .servicePanel, .profileCard, .policyCard, .methodCard, .scopeCard, .sourceCard, .sensitivityCard"));
     const mapsLoaded = !document.body.innerText.includes("지도 로딩 중");
     const legendVisible = document.body.innerText.includes("우선 점검 필요") && document.body.innerText.includes("대체로 양호");
     const dataSourceVisible = document.body.innerText.includes("점수 산식·출처 확인") || document.body.innerText.includes("데이터 출처");
@@ -58,7 +61,7 @@ async function main() {
     const viewportDir = path.join(outputDir, name);
     mkdirSync(viewportDir, { recursive: true });
     await page.setViewportSize({ width, height });
-    await page.goto(appUrl, { waitUntil: "domcontentloaded" });
+      await page.goto(appUrl, { waitUntil: "domcontentloaded" });
     await page.waitForLoadState("load");
     await page.locator(".mapLoading").first().waitFor({ state: "hidden", timeout: 30000 }).catch(() => undefined);
     await page.waitForTimeout(1200);

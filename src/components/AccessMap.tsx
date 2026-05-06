@@ -12,6 +12,7 @@ type AccessMapProps = {
   metric: ScoreMetric;
   compact?: boolean;
   serviceFilter?: ServicePoint["service_type"];
+  variant?: "v1" | "v2";
 };
 
 const scoreStops = [
@@ -93,7 +94,7 @@ function popupContent(lines: string[]) {
   return wrapper;
 }
 
-export function AccessMap({ areas, points, metric, compact = false, serviceFilter }: AccessMapProps) {
+export function AccessMap({ areas, points, metric, compact = false, serviceFilter, variant = "v1" }: AccessMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const labelMarkersRef = useRef<maplibregl.Marker[]>([]);
@@ -127,7 +128,11 @@ export function AccessMap({ areas, points, metric, compact = false, serviceFilte
             id: "osm",
             type: "raster",
             source: "osm",
-            paint: { "raster-opacity": compact ? 0.42 : 0.58, "raster-saturation": -0.65 },
+            paint: {
+              "raster-opacity": variant === "v2" ? (compact ? 0.28 : 0.38) : compact ? 0.42 : 0.58,
+              "raster-saturation": variant === "v2" ? -0.78 : -0.65,
+              "raster-brightness-min": variant === "v2" ? 0.12 : 0,
+            },
           },
         ],
       },
@@ -157,8 +162,8 @@ export function AccessMap({ areas, points, metric, compact = false, serviceFilte
         paint: {
           "circle-radius": ["interpolate", ["linear"], ["get", "score"], 40, compact ? 30 : 52, 85, compact ? 16 : 30],
           "circle-color": ["interpolate", ["linear"], ["get", "score"], ...scoreStops],
-          "circle-opacity": compact ? 0.18 : 0.22,
-          "circle-stroke-width": 1,
+          "circle-opacity": variant === "v2" ? (compact ? 0.24 : 0.3) : compact ? 0.18 : 0.22,
+          "circle-stroke-width": variant === "v2" ? 1.5 : 1,
           "circle-stroke-color": ["interpolate", ["linear"], ["get", "score"], ...scoreStops],
           "circle-stroke-opacity": 0.45,
         },
@@ -169,7 +174,7 @@ export function AccessMap({ areas, points, metric, compact = false, serviceFilte
         type: "circle",
         source: "areas",
         paint: {
-          "circle-radius": compact ? 5 : 8,
+          "circle-radius": variant === "v2" ? (compact ? 5.5 : 9) : compact ? 5 : 8,
           "circle-color": ["interpolate", ["linear"], ["get", "score"], ...scoreStops],
           "circle-stroke-width": compact ? 1.5 : 2,
           "circle-stroke-color": "#ffffff",
@@ -181,7 +186,7 @@ export function AccessMap({ areas, points, metric, compact = false, serviceFilte
         type: "circle",
         source: "services",
         paint: {
-          "circle-radius": compact ? 4 : 6,
+          "circle-radius": variant === "v2" ? (compact ? 4.8 : 7) : compact ? 4 : 6,
           "circle-color": ["get", "color"],
           "circle-stroke-width": 2,
           "circle-stroke-color": "#ffffff",
@@ -238,7 +243,7 @@ export function AccessMap({ areas, points, metric, compact = false, serviceFilte
       map.remove();
       mapRef.current = null;
     };
-  }, [areaData, areas, compact, pointData, points]);
+  }, [areaData, areas, compact, pointData, points, variant]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -276,7 +281,7 @@ export function AccessMap({ areas, points, metric, compact = false, serviceFilte
 
   return (
     <div
-      className={compact ? "mapShell compact realMapShell" : "mapShell realMapShell"}
+      className={`${compact ? "mapShell compact realMapShell" : "mapShell realMapShell"} ${variant === "v2" ? "mapShellV2" : ""}`}
       role="img"
       tabIndex={0}
       aria-label={`${metricLabel}를 우선 점검 필요, 주의 관찰, 대체로 양호 구간으로 표시한 성남 생활권 지도`}
