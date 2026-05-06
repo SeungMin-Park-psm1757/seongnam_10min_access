@@ -1,0 +1,6 @@
+.next/
+node_modules/
+artifacts/demo/*.webm
+.env*
+!.env.example
+npm-debug.log*
