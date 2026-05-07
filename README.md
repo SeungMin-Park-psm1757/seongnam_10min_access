@@ -2,10 +2,9 @@
 
 ## 실행 링크
 
-- 제출용 v2: [http://127.0.0.1:3100/v2](http://127.0.0.1:3100/v2)
-- 기존 보존 v1: [http://127.0.0.1:3100/v1](http://127.0.0.1:3100/v1)
-
-위 링크는 로컬 서버 실행 후 접속하는 주소입니다. GitHub Pages 배포를 설정하면 공개 실행 링크를 이 위치에 추가합니다.
+- 제출용 v2: [https://seungmin-park-psm1757.github.io/seongnam_10min_access/v2/](https://seungmin-park-psm1757.github.io/seongnam_10min_access/v2/)
+- 기존 보존 v1: [https://seungmin-park-psm1757.github.io/seongnam_10min_access/v1/](https://seungmin-park-psm1757.github.io/seongnam_10min_access/v1/)
+- 기본 화면: [https://seungmin-park-psm1757.github.io/seongnam_10min_access/](https://seungmin-park-psm1757.github.io/seongnam_10min_access/)
 
 성남시 생활필수 서비스가 단순히 존재하는지보다 시민이 실제로 이용하기 쉬운지를 비교하는 공모전 제출용 정책 시각화 대시보드입니다. 의료, 약국, 교통, 돌봄 접근성을 종합해 생활권별 격차와 정책 보완 방향을 제시합니다.
 
