@@ -14,6 +14,7 @@ const services = [
     key: "medical_score",
     point: "medical",
     label: "의료",
+    icon: "+",
     color: "#2f6f68",
     basis: "의료기관 거리와 주변 의료 거점 밀도를 본 접근성 지표",
     policy: "공공보건·방문상담 연계를 우선 검토합니다.",
@@ -22,6 +23,7 @@ const services = [
     key: "pharmacy_score",
     point: "pharmacy",
     label: "약국",
+    icon: "Rx",
     color: "#52708f",
     basis: "약국 위치와 의료 거점 연결성을 본 의약품 접근성 지표",
     policy: "야간·휴일 이용 가능성과 위치 안내를 함께 점검합니다.",
@@ -30,6 +32,7 @@ const services = [
     key: "transit_score",
     point: "bus",
     label: "교통",
+    icon: "B",
     color: "#9a6b2f",
     basis: "정류장 접근성과 생활서비스 이동 편의를 반영한 지표",
     policy: "정류장 접근과 보행 동선을 함께 점검합니다.",
@@ -38,6 +41,7 @@ const services = [
     key: "care_score",
     point: "care",
     label: "돌봄",
+    icon: "C",
     color: "#8f4f4f",
     basis: "돌봄 거점 위치와 고령·돌봄 수요 관계를 본 지표",
     policy: "수요 대비 생활서비스·상담 거점 보완을 검토합니다.",
@@ -46,6 +50,7 @@ const services = [
   key: MetricKey;
   point: ServicePoint["service_type"];
   label: string;
+  icon: string;
   color: string;
   basis: string;
   policy: string;
@@ -74,9 +79,9 @@ const policyPlans: Record<
   "의료 접근 보완형": {
     summary: "가까운 의료·약국 이용을 우선 확인할 생활권",
     why: "의료·약국 접근이 낮으면 작은 불편도 건강 안전망의 약점이 될 수 있습니다.",
-    signal: "의료·약국 점수가 낮고 고령층 또는 1인가구 비중이 함께 높습니다.",
-    now: "동네의원, 약국, 야간·휴일 진료 정보를 한눈에 정리합니다.",
-    mid: "공공보건, 방문상담, 복약 안내를 행정복지센터와 연계합니다.",
+    signal: "의료·약국 점수가 낮고 고령·1인가구 비중이 함께 높습니다.",
+    now: "동네의원, 약국, 야간·휴일 진료 정보를 한곳에 정리합니다.",
+    mid: "공공보건, 방문상담, 복약 안내를 동 행정과 연계합니다.",
     dept: "보건소, 행정복지센터, 공공의료 협력기관",
     accent: "#2f6f68",
     emptyInsight: "대표 10개 동에서는 복합 보완 유형에 포함됩니다. 전수 분석에서 단독 유형을 추가 확인합니다.",
@@ -84,9 +89,9 @@ const policyPlans: Record<
   "이동 접근 보완형": {
     summary: "정류장 접근과 보행 연결을 함께 볼 생활권",
     why: "정류장이 가까워도 보행동선·경사·횡단 여건이 불편하면 체감 접근성은 낮아집니다.",
-    signal: "교통 점수가 낮고 생활서비스 이용을 위한 이동 의존도가 높습니다.",
-    now: "정류장까지의 보행동선, 경사, 횡단 안전, 안내표지를 점검합니다.",
-    mid: "마을버스 보완, 생활서비스 연결 노선, 보행환경 개선을 함께 검토합니다.",
+    signal: "교통 점수가 낮고 생활서비스 이용 이동 의존도가 높습니다.",
+    now: "정류장까지의 보행동선, 경사, 횡단 안전을 점검합니다.",
+    mid: "마을버스 보완과 생활서비스 연결 노선을 함께 검토합니다.",
     dept: "교통기획과, 도로관리부서, 동 행정복지센터",
     accent: "#9a6b2f",
     emptyInsight: "대표 10개 동에서는 돌봄·복합 보완과 함께 관찰됩니다. 전수 분석에서 단독 유형을 추가 확인합니다.",
@@ -94,9 +99,9 @@ const policyPlans: Record<
   "돌봄 접근 보완형": {
     summary: "돌봄 수요와 생활서비스 거점을 맞춰볼 생활권",
     why: "돌봄 수요와 생활서비스 거점이 어긋나면 안내만으로도 이용 격차가 생깁니다.",
-    signal: "돌봄 점수가 낮고 고령·돌봄 수요가 높은 동에서 먼저 확인됩니다.",
+    signal: "돌봄 점수가 낮고 고령·돌봄 수요가 높은 동에서 확인됩니다.",
     now: "돌봄센터 이용 정보와 복지상담 창구를 함께 안내합니다.",
-    mid: "방문돌봄, 생활지원, 고령친화 이동지원을 연계해 검토합니다.",
+    mid: "방문돌봄, 생활지원, 고령친화 이동지원을 연계합니다.",
     dept: "복지정책과, 노인복지부서, 동 행정복지센터",
     accent: "#8f4f4f",
     emptyInsight: "현재 대표 표본에서는 돌봄·복합 보완 유형이 우선적으로 관찰됩니다. 단독 돌봄 유형은 전수 분석에서 추가 확인합니다.",
@@ -106,7 +111,7 @@ const policyPlans: Record<
     why: "의료·이동·돌봄 중 하나만 보강하면 체감 개선이 제한적일 수 있습니다.",
     signal: "종합 접근성이 낮고 지원수요가 높은 동이 함께 묶입니다.",
     now: "보건·교통·돌봄 상담을 동 단위로 함께 안내합니다.",
-    mid: "생활SOC 거점, 이동지원, 방문서비스 연계를 검토합니다.",
+    mid: "생활SOC 거점, 이동지원, 방문서비스를 묶어 검토합니다.",
     dept: "정책기획과, 보건소, 복지·교통 부서 합동",
     accent: "#a84f3f",
     emptyInsight: "복합 보완 필요 생활권이 없으면 서비스별 우선 점검 카드로 나눠 검토합니다.",
@@ -142,8 +147,8 @@ function policyType(area: AreaMetric): PolicyKind {
 function priorityReason(area: AreaMetric) {
   const [key, value] = weakestService(area);
   return [
-    "생활서비스가 부족한 편입니다.",
-    `접근성 ${Math.round(area.overall_score)}점 · 우선 확인 축 ${serviceLabels[key]} ${Math.round(value)}점`,
+    `${serviceLabels[key]} 접근을 먼저 확인할 생활권입니다.`,
+    `종합 ${Math.round(area.overall_score)}점 · ${serviceLabels[key]} ${Math.round(value)}점`,
   ];
 }
 
@@ -153,8 +158,8 @@ function scoreBand(score: number) {
   return "대체로 양호";
 }
 
-function ServiceRank({ areas, metric }: { areas: AreaMetric[]; metric: MetricKey }) {
-  const ranked = sortBy(areas, (area) => Number(area[metric])).slice(0, 5);
+function ServiceRank({ areas, metric, limit = 5 }: { areas: AreaMetric[]; metric: MetricKey; limit?: number }) {
+  const ranked = sortBy(areas, (area) => Number(area[metric])).slice(0, limit);
   if (ranked.length === 0) return <p className="emptyHint">표시할 데이터가 없습니다.</p>;
 
   return (
@@ -226,7 +231,7 @@ function MetricCardV2({ average }: { average: number }) {
       <span className="v2-muted">대표 생활권 평균 접근성</span>
       <strong className="v2-kpi">{average || "-"}</strong>
       <em className="v2-card-desc">
-        {average ? `${scoreBand(average)}. 100점에 가까울수록 생활필수 서비스에 닿기 쉽습니다.` : "데이터 필요"}
+        {average ? `${scoreBand(average)}. 점수가 높을수록 생활필수 서비스에 닿기 쉽습니다.` : "데이터 필요"}
       </em>
     </section>
   );
@@ -235,7 +240,7 @@ function MetricCardV2({ average }: { average: number }) {
 function MethodologyButtonV2({ areas }: { areas: AreaMetric[] }) {
   return (
     <div className="v2-methodology-button">
-      <MethodologyDialog areas={areas} />
+      <MethodologyDialog areas={areas} variant="v2" />
     </div>
   );
 }
@@ -264,26 +269,37 @@ function InsightCardV2({ children, className = "" }: { children: ReactNode; clas
   return <section className={`v2-card v2-insight-card ${className}`}>{children}</section>;
 }
 
+function LegendV2() {
+  return (
+    <div className="v2-common-legend" aria-label="서비스별 색상 범례">
+      <span><i className="low" />우선 점검</span>
+      <span><i className="mid" />주의 관찰</span>
+      <span><i className="high" />대체로 양호</span>
+    </div>
+  );
+}
+
+function serviceAverage(areas: AreaMetric[], metric: MetricKey) {
+  if (areas.length === 0) return 0;
+  return Math.round(areas.reduce((sum, area) => sum + Number(area[metric]), 0) / areas.length);
+}
+
 function ScopeCard({ count }: { count: number }) {
   return (
     <section className="v2-card scopeCard" aria-label="분석 범위">
-      <p className="eyebrow">분석 범위: 대표 생활권 10개 동</p>
+      <p className="eyebrow">분석 범위</p>
       <h3 className="v2-card-title ko-card-title">
         <span>{dataScope.title}</span>
-        <span>고령·1인가구·접근성 편차·권역 대표성 기준</span>
       </h3>
       <LineText
         className="v2-card-desc ko-card-desc"
-        lines={["수정·중원·분당의 생활권 차이가 함께 보이도록", "대표 표본을 구성했습니다."]}
+        lines={["수정·중원·분당의 생활권 차이가 함께 보이도록 대표 표본을 구성했습니다."]}
       />
-      <div>
+      <div className="v2-scope-tags">
         <span>대표 {count}개 동</span>
-        <span>권역 대표성 반영</span>
-        <span>전수 분석 가능한 CSV 구조</span>
-      </div>
-      <div className="expansionSlot">
-        <strong>전수 분석 확장 슬롯</strong>
-        <span>전체 행정동 CSV 입력 시 평균 범위와 대표 10개 동 분포를 자동 비교합니다.</span>
+        <span>고령·1인가구</span>
+        <span>접근성 편차</span>
+        <span>권역 대표성</span>
       </div>
     </section>
   );
@@ -404,9 +420,11 @@ export async function DashboardV2() {
                 ))}
               </ol>
             </InsightCardV2>
-            <MethodCard average={average} count={areas.length} />
-            <SensitivityToggle areas={areas} />
-            <DataSourceCard />
+            <div className="v2-supporting-cards">
+              <MethodCard average={average} count={areas.length} />
+              <SensitivityToggle areas={areas} />
+              <DataSourceCard />
+            </div>
           </aside>
         </div>
       </section>
@@ -421,22 +439,23 @@ export async function DashboardV2() {
           ]}
         />
         <strong className="conclusionLine v2-reading-note">정책적 의미: 같은 생활권이라도 먼저 보완할 서비스는 다를 수 있습니다.</strong>
+        <LegendV2 />
         <div className="smallMultiples">
           {services.map((service) => (
             <article key={service.key} className="servicePanel">
               <div className="panelHead">
                 <div>
-                  <p>우선 점검 TOP 5 · 해당 서비스 점수</p>
-                  <h3 className="ko-card-title">{service.label} 접근성</h3>
+                  <p>부족 생활권 TOP 3</p>
+                  <h3 className="ko-card-title">
+                    <span className="serviceIcon" style={{ color: service.color, borderColor: service.color }}>{service.icon}</span>
+                    {service.label} 접근성
+                  </h3>
+                  <strong className="serviceStatus">{serviceAverage(areas, service.key)}점 · {scoreBand(serviceAverage(areas, service.key))}</strong>
                 </div>
                 <span style={{ background: service.color }} />
               </div>
               <MapPanelV2 areas={areas} points={points} metric={service.key} compact serviceFilter={service.point} />
-              <div className="serviceMethod">
-                <strong>산정 기준</strong>
-                <span className="ko-card-desc">{service.basis}</span>
-              </div>
-              <ServiceRank areas={areas} metric={service.key} />
+              <ServiceRank areas={areas} metric={service.key} limit={3} />
               <p className="policyHint ko-card-desc">{service.policy}</p>
             </article>
           ))}
@@ -446,7 +465,7 @@ export async function DashboardV2() {
       <section id="screen-3" className="v2-section screen overlapScreen">
         <SectionHeaderV2
           eyebrow="화면 3 · 어디가 우선인가"
-          title="접근은 낮고 돌봄 수요는 높은 곳을 먼저 확인합니다."
+          title="접근이 어렵고 지원수요가 높은 생활권부터 먼저 점검합니다."
           note={[
             "가로축은 10분 접근의 어려움, 세로축은 고령·1인가구·돌봄수요입니다.",
             "오른쪽 위에 가까울수록 정책 지원의 우선 검토 대상입니다.",
@@ -459,6 +478,7 @@ export async function DashboardV2() {
           initialAreaId={selectedArea?.area_id}
           policyTypes={Object.fromEntries(areas.map((area) => [area.area_id, policyType(area)]))}
           weakestServices={Object.fromEntries(areas.map((area) => [area.area_id, serviceLabels[weakestService(area)[0]]]))}
+          variant="v2"
         />
       </section>
 
@@ -492,15 +512,11 @@ export async function DashboardV2() {
               </div>
               <dl>
                 <div>
-                  <dt>왜 보완이 필요한가</dt>
-                  <dd>{plan.why}</dd>
-                </div>
-                <div>
-                  <dt>데이터가 보여주는 신호</dt>
+                  <dt>데이터 신호</dt>
                   <dd>{plan.signal}</dd>
                 </div>
                 <div>
-                  <dt>먼저 할 수 있는 일</dt>
+                  <dt>먼저 할 일</dt>
                   <dd>{plan.now}</dd>
                 </div>
                 <div>

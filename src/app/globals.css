@@ -1516,6 +1516,18 @@ th {
   letter-spacing: 0;
 }
 
+.v2-page .v2-hero .v2-section-header {
+  margin-bottom: 18px;
+}
+
+.v2-page .v2-hero .v2-title {
+  line-height: 1.16;
+}
+
+.v2-page .v2-hero .v2-body {
+  margin-top: 20px;
+}
+
 .v2-page .heroGrid,
 .v2-page .needAccessGrid {
   grid-template-columns: minmax(0, 1.5fr) minmax(372px, 0.5fr);
@@ -1527,6 +1539,7 @@ th {
 }
 
 .v2-page .actionGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 28px;
 }
 
@@ -1563,8 +1576,9 @@ th {
 
 .v2-page .v2-metric-card {
   display: grid;
-  gap: 15px;
+  gap: 18px;
   border-left: 6px solid var(--v2-teal);
+  padding: 28px;
 }
 
 .v2-page .v2-muted,
@@ -1596,12 +1610,21 @@ th {
   background: var(--v2-panel);
 }
 
+.v2-page .v2-supporting-cards {
+  display: grid;
+  gap: 18px;
+}
+
 .v2-page .scopeCard div,
 .v2-page .scoreLegend,
 .v2-page .sourceMini,
 .v2-page .scenarioTabs,
 .v2-page .policyAreas {
   gap: 9px;
+}
+
+.v2-page .v2-scope-tags span {
+  font-size: 12.5px;
 }
 
 .v2-page .weightGrid span,
@@ -1623,10 +1646,11 @@ th {
 .v2-page .priorityList li,
 .v2-page .rankList li,
 .v2-page .miniRank li {
-  min-height: 54px;
+  min-height: 60px;
   border-radius: 8px;
   background: #fbf8f1;
   padding: 12px 14px;
+  line-height: 1.58;
 }
 
 .v2-page .priorityList > li > span,
@@ -1638,13 +1662,66 @@ th {
 
 .v2-page .priorityList em {
   color: var(--v2-brick);
-  line-height: 1.45;
+  line-height: 1.55;
+}
+
+.v2-page .v2-common-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: fit-content;
+  margin: -4px 0 22px;
+  border: 1px solid rgba(19, 38, 53, 0.13);
+  border-radius: 8px;
+  background: rgba(255, 254, 250, 0.9);
+  padding: 10px 12px;
+}
+
+.v2-page .v2-common-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #405158;
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.v2-page .v2-common-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
 }
 
 .v2-page .servicePanel {
-  gap: 16px;
-  min-height: 620px;
+  gap: 18px;
+  min-height: 560px;
   padding: 24px;
+}
+
+.v2-page .servicePanel .mapLegend {
+  display: none;
+}
+
+.v2-page .serviceIcon {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  margin-right: 9px;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 850;
+  vertical-align: middle;
+}
+
+.v2-page .serviceStatus {
+  display: block;
+  margin-top: 10px;
+  color: #405158;
+  font-size: 13px;
+  font-weight: 760;
+  line-height: 1.55;
 }
 
 .v2-page .serviceMethod,
@@ -1681,7 +1758,7 @@ th {
 }
 
 .v2-page .mapShell.compact {
-  min-height: 280px;
+  min-height: 300px;
 }
 
 .v2-page .mapLegend,
@@ -1715,6 +1792,10 @@ th {
   border-radius: 8px;
   box-shadow: none;
   background-size: 25% 25%;
+}
+
+.v2-page .scatterPlotV2 {
+  background-size: 50% 50%;
 }
 
 .v2-page .axis {
@@ -1755,6 +1836,24 @@ th {
   right: 24px;
 }
 
+.v2-page .scatterDot.unlabeled {
+  width: var(--dot-size, 38px);
+  height: var(--dot-size, 38px);
+  min-width: 0;
+  min-height: 0;
+  border-radius: 999px;
+  background: rgba(255, 254, 250, 0.72);
+  padding: 0;
+}
+
+.v2-page .scatterDot.unlabeled span {
+  display: none;
+}
+
+.v2-page .scatterDot.selected {
+  outline: 5px solid rgba(36, 106, 100, 0.24);
+}
+
 .v2-page .profileCard {
   align-content: start;
   padding: 30px;
@@ -1790,9 +1889,76 @@ th {
   gap: 14px;
 }
 
-.v2-page .policyCard {
+.v2-page .profileCardV2 {
   gap: 22px;
-  min-height: 560px;
+}
+
+.v2-page .profileHero {
+  display: grid;
+  gap: 12px;
+}
+
+.v2-page .profileHero h3 {
+  margin: 0;
+}
+
+.v2-page .profileHero strong,
+.v2-page .profileInterpretation {
+  color: var(--v2-ink);
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.72;
+}
+
+.v2-page .profileHero span {
+  width: fit-content;
+  border-radius: 8px;
+  background: #e8f0ed;
+  padding: 8px 10px;
+  color: var(--v2-teal);
+  font-size: 12.5px;
+  font-weight: 820;
+}
+
+.v2-page .profileMetricGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.v2-page .profileMetricGrid div {
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(19, 38, 53, 0.12);
+  border-radius: 8px;
+  background: #fbf8f1;
+  padding: 14px;
+}
+
+.v2-page .profileMetricGrid span {
+  color: var(--v2-muted);
+  font-size: 12.5px;
+}
+
+.v2-page .profileMetricGrid strong {
+  color: var(--v2-ink);
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.v2-page .profileInterpretation {
+  margin: 0;
+  border-left: 4px solid var(--v2-sage);
+  padding-left: 12px;
+}
+
+.v2-page .demandBars div {
+  grid-template-columns: 58px 1fr 34px;
+}
+
+.v2-page .policyCard {
+  gap: 24px;
+  min-height: 0;
   padding: 30px;
   border-top-width: 5px;
 }
@@ -1814,6 +1980,26 @@ th {
   padding: 16px;
 }
 
+.v2-page .policyCard dl {
+  margin: 0;
+}
+
+.v2-page .policyCard dl div {
+  grid-template-columns: 118px minmax(0, 1fr);
+  gap: 22px;
+  padding: 0;
+}
+
+.v2-page .policyCard dt {
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.v2-page .policyCard dd {
+  font-size: 15px;
+  line-height: 1.76;
+}
+
 .v2-page .methodologyDialogLauncher button {
   background: #edf4f1;
   padding: 12px 14px;
@@ -1832,6 +2018,94 @@ th {
 
 .v2-page .methodologyGrid {
   gap: 18px;
+}
+
+.v2-page .methodologyDialogV2 {
+  width: min(1120px, calc(100vw - 64px));
+}
+
+.v2-page .methodologyGridV2 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.v2-page .methodologyGridV2 article {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 20px;
+}
+
+.v2-page .methodologyGridV2 h4 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.v2-page .methodologyGridV2 p,
+.v2-page .methodologyGridV2 li,
+.v2-page .formulaCards dd,
+.v2-page .methodSourceTable th,
+.v2-page .methodSourceTable td {
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.v2-page .formulaCards div {
+  border: 1px solid rgba(19, 38, 53, 0.12);
+  border-radius: 8px;
+  background: #fbf8f1;
+  padding: 14px;
+}
+
+.v2-page .methodSourceTable th,
+.v2-page .methodSourceTable td {
+  padding: 14px 10px;
+}
+
+.v2-page .methodSourceTable th {
+  width: 90px;
+}
+
+.presentation-mode .v2-page .v2-topbar nav,
+.presentation-mode .v2-page .v2-supporting-cards,
+.presentation-mode .v2-page .methodologyDialogLauncher {
+  display: none;
+}
+
+.presentation-mode .v2-page .v2-topbar {
+  padding: 18px 52px 0;
+  border-bottom: 0;
+  background: var(--v2-bg);
+}
+
+.presentation-mode .v2-page .v2-section {
+  min-height: 100vh;
+  padding: 46px 52px 60px;
+}
+
+.presentation-mode .v2-page .v2-title {
+  font-size: 58px;
+}
+
+.presentation-mode .v2-page .v2-body,
+.presentation-mode .v2-page .v2-reading-note {
+  font-size: 18px;
+}
+
+.presentation-mode .v2-page .mapShell {
+  min-height: 590px;
+}
+
+.presentation-mode .v2-page .mapShell.compact {
+  min-height: 275px;
+}
+
+.presentation-mode .v2-page .servicePanel {
+  min-height: 0;
+}
+
+.presentation-mode .v2-page .policyCard {
+  padding: 34px;
 }
 
 @media (max-width: 1440px) {
@@ -1858,11 +2132,11 @@ th {
   }
 
   .v2-page .servicePanel {
-    min-height: 590px;
+    min-height: 535px;
   }
 
   .v2-page .policyCard {
-    min-height: 540px;
+    min-height: 0;
   }
 }
 
@@ -1886,6 +2160,10 @@ th {
   .v2-page .v2-title {
     font-size: 38px;
     line-height: 1.1;
+  }
+
+  .v2-page .serviceScreen .v2-title {
+    font-size: 34px;
   }
 
   .v2-page .prioritySectionTitle .v2-title {
@@ -1924,7 +2202,7 @@ th {
   }
 
   .v2-page .mapShell.compact {
-    min-height: 245px;
+    min-height: 205px;
   }
 
   .v2-page .smallMultiples,
@@ -1933,7 +2211,8 @@ th {
   }
 
   .v2-page .servicePanel {
-    min-height: 560px;
+    gap: 14px;
+    min-height: 465px;
   }
 
   .v2-page .scatterPlot,
@@ -1946,6 +2225,10 @@ th {
   }
 
   .v2-page .policyCard {
-    min-height: 520px;
+    min-height: 0;
+  }
+
+  .v2-page .methodologyGridV2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
