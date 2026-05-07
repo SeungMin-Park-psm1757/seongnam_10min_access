@@ -4,3 +4,4 @@ artifacts/demo/*.webm
 .env*
 !.env.example
 npm-debug.log*
+*.log
