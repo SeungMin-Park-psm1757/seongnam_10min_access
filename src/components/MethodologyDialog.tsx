@@ -45,7 +45,7 @@ export function MethodologyDialog({ areas, variant = "v1" }: { areas: AreaMetric
                 <tbody>
                   <tr>
                     <th>서비스</th>
-                    <td>의료기관, 약국, 버스정류장, 복지·돌봄 생활서비스 거점</td>
+                    <td>의료기관, 약국, 노인복지관, 공영차고지 좌표 기반 교통 대리 지표</td>
                   </tr>
                   <tr>
                     <th>수요</th>
@@ -96,7 +96,7 @@ export function MethodologyDialog({ areas, variant = "v1" }: { areas: AreaMetric
 
             <article>
               <h4>한계와 확장</h4>
-              <p>현재 점수는 위치 기반 근사 접근성입니다. 보행 네트워크와 실제 이동시간 데이터를 결합하면 10분 도달성 지표로 확장할 수 있습니다.</p>
+              <p>현재 점수는 위치 기반 근사 접근성입니다. 정류장 좌표, 보행 네트워크, 실제 이동시간 데이터를 결합하면 10분 도달성 지표로 확장할 수 있습니다.</p>
             </article>
 
             <article>

@@ -1,48 +1,50 @@
 # 데이터 매핑 문서
 
-이 앱은 `data/` 폴더의 CSV를 서버에서 읽어 대시보드를 렌더링한다. 실제 공공데이터 파일명이 확정되면 아래 표준 컬럼으로 전처리한 뒤 같은 파일명으로 교체하면 된다.
+이 앱은 `data/` 폴더의 CSV를 서버에서 읽어 대시보드를 렌더링한다. 현재 CSV는 `scripts/prepare-official-data.py`로 공식 공개 파일을 전처리해 생성했다.
 
 ## `data/accessibility_metrics.csv`
 
 | 컬럼 | 의미 |
 | --- | --- |
-| `area_id` | 동 또는 분석 격자의 고유 ID |
+| `area_id` | 대표 생활권 고유 ID |
 | `area_name` | 표시 이름 |
 | `district` | 구 이름 |
-| `x`, `y` | 버블·행렬 등 보조 시각화 배치용 예비 좌표 |
-| `lat`, `lng` | MapLibre 기반 성남 지도에 표시할 동 중심 좌표 |
-| `population` | 인구 규모 |
-| `elderly_ratio` | 65세 이상 비율 |
-| `single_ratio` | 1인 가구 비율 |
-| `care_demand` | 돌봄 수요 대리 지표 |
-| `medical_score` | 의료기관 10분 접근 점수 |
-| `pharmacy_score` | 약국 10분 접근 점수 |
-| `transit_score` | 대중교통 10분 접근 점수 |
-| `care_score` | 돌봄·복지 거점 10분 접근 점수 |
+| `x`, `y` | 버블·행렬 등 보조 시각화 배치용 좌표 |
+| `lat`, `lng` | 지도에 표시할 대표 동 중심 좌표 |
+| `population` | 공식 인구 CSV의 동별 인구 |
+| `elderly_ratio` | 65세 이상 인구 비율 |
+| `single_ratio` | 1인세대 비율 |
+| `care_demand` | 고령층, 1인세대, 고령 1인세대를 결합한 지원수요 지표 |
+| `medical_score` | 동별 의료기관 수를 0~100 범위로 표준화한 접근성 점수 |
+| `pharmacy_score` | 동별 약국 수를 0~100 범위로 표준화한 접근성 점수 |
+| `transit_score` | 버스공영차고지 거리 기반 교통 대리 점수 |
+| `care_score` | 가장 가까운 노인복지관까지의 거리 기반 돌봄 접근 점수 |
 | `overall_score` | 의료 0.3, 약국 0.2, 교통 0.25, 돌봄 0.25 가중 종합 점수 |
-| `vulnerable_index` | 취약계층 중첩 지수 |
+| `vulnerable_index` | 고령층·1인세대·지원수요를 결합한 취약성 지표 |
+| `selection_note` | 원천 데이터 기반 해석 메모 |
 
 ## `data/service_points.csv`
 
 | 컬럼 | 의미 |
 | --- | --- |
 | `service_type` | `medical`, `pharmacy`, `bus`, `care` 중 하나 |
-| `lat`, `lng` | 원본 생활서비스 거점 좌표 |
-| `name` | 생활서비스 거점명 |
+| `lat`, `lng` | 서비스 거점 좌표 |
+| `name` | 서비스 거점명 |
 | `district` | 구 이름 |
-| `area_name` | 연결할 동 이름 |
+| `area_name` | 대표 동과 연결되는 경우 동 이름 |
 
-## 지도 메모
+## 전처리 메모
 
-- 지도는 `MapLibre GL`과 OpenStreetMap raster tile을 사용한다.
-- 동 경계 GeoJSON이 준비되면 현재 동 중심 원형 레이어를 행정동 polygon choropleth로 교체할 수 있다.
-- 현재 원형은 실제 좌표 위에 올린 10분 접근권 상대 범위이며, 생활서비스 마커는 `service_points.csv` 좌표를 그대로 사용한다.
+- 의료기관·약국은 공공데이터포털 CSV 주소의 구·법정동 문자열을 기준으로 대표 동에 매핑했다.
+- 의료기관·약국 좌표는 도로명주소를 Nominatim으로 지오코딩해 생성했다. 지오코딩 실패 주소는 같은 동 후보 중 다음 주소를 사용했다.
+- 노인복지관은 공공데이터포털 CSV의 시설 목록을 쓰고, 성남시 복지시설 좌표 PDF로 좌표를 보정했다.
+- 교통은 버스정류장 전수 좌표가 아니라 공영차고지 거리 기반 대리 점수다. 정류장 좌표 확보 시 `transit_score`를 재산출해야 한다.
 - 앱은 위도/경도가 성남시 주변 범위에서 벗어나거나 서비스 유형이 맞지 않는 행을 제외하고 데이터 상태 배너에 표시한다.
-- 검토용 상태는 `/?scenario=empty`, `/?scenario=error`에서 확인할 수 있다.
 
-## 산식 메모
+## 갱신 방법
 
-- 서비스별 점수는 10분 안 접근 가능성을 0~100으로 표준화한다.
-- 네트워크 시간이 있으면 시간 기반, 없으면 같은 기준의 근접도·버퍼 지표로 대체한다.
-- 정책 우선순위는 `(100 - 종합접근점수) * 0.6 + 취약계층중첩지수 * 0.4`로 정렬한다.
-- 화면 문구는 절대적 결핍이 아니라 상대 격차와 보완 우선순위를 설명하도록 제한한다.
+```bash
+python scripts/prepare-official-data.py
+```
+
+원천 CSV를 같은 파일명으로 갱신한 뒤 위 스크립트를 다시 실행하면 `data/accessibility_metrics.csv`와 `data/service_points.csv`가 재생성된다.

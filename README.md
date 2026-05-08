@@ -33,10 +33,14 @@ powershell -ExecutionPolicy Bypass -File scripts/run-local.ps1 -Port 3100
 
 ## 데이터 교체 방법
 
-- 기본 데이터는 `data/accessibility_metrics.csv`와 `data/service_points.csv`를 사용합니다.
-- 같은 컬럼 구조로 CSV를 교체하면 화면과 지도가 갱신됩니다.
-- 대표 10개 동 표본을 전체 행정동 전수 분석 구조로 확장할 수 있습니다.
-- 민간 통신, 카드 집계, 보행 네트워크 데이터가 추가되면 지표의 설명력을 더 높일 수 있습니다.
+- 현재 데이터는 성남시·공공데이터포털 공개 CSV를 내려받아 `scripts/prepare-official-data.py`로 재산출했습니다.
+- 산출 파일은 `data/accessibility_metrics.csv`와 `data/service_points.csv`입니다.
+- 의료·약국·인구·1인가구·노인복지관은 공식 공개 파일 기반이며, 교통은 버스공영차고지 거리 기반 대리 지표입니다.
+- 정류장 전수 좌표, 민간 통신·카드 집계, 보행 네트워크 데이터가 추가되면 같은 컬럼 구조로 지표를 다시 계산할 수 있습니다.
+
+```bash
+python scripts/prepare-official-data.py
+```
 
 ## 캡처
 

@@ -54,8 +54,8 @@ export const DEFAULT_WEIGHTS = {
 
 export const dataScope = {
   title: "대표 생활권 10개 동",
-  summary: "고령층 비중, 1인가구 비중, 생활서비스 접근 편차, 수정·중원·분당 권역 대표성을 기준으로 구성했습니다.",
-  caveat: "동일 CSV 매핑으로 전체 행정동 전수 분석까지 확장할 수 있습니다.",
+  summary: "성남시·공공데이터포털 공개 CSV를 대표 생활권 10개 동으로 매핑해 구성했습니다.",
+  caveat: "교통은 공영차고지 거리 기반 대리 지표이며, 정류장·보행 네트워크 데이터 확보 시 재산출할 수 있습니다.",
 };
 
 const areaFallback: AreaMetric[] = [
