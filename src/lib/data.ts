@@ -55,7 +55,7 @@ export const DEFAULT_WEIGHTS = {
 export const dataScope = {
   title: "대표 생활권 10개 동",
   summary: "성남시·공공데이터포털 공개 CSV를 대표 생활권 10개 동으로 매핑해 구성했습니다.",
-  caveat: "교통은 공영차고지 거리 기반 대리 지표이며, 정류장·보행 네트워크 데이터 확보 시 재산출할 수 있습니다.",
+  caveat: "교통은 실제 버스정류장 좌표와의 거리 기반이며, 보행 네트워크 데이터 확보 시 이동시간으로 재산출할 수 있습니다.",
 };
 
 const areaFallback: AreaMetric[] = [

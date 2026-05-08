@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "raw_official"
 OUT = ROOT / "data"
 CACHE = RAW / "geocode_cache.json"
+OSM_BUS_STOPS = RAW / "osm_seongnam_bus_stops.json"
 
 TARGET_AREAS = [
     ("D001", "태평1동", "수정구", "태평", 37.446, 127.127, 16, 22),
@@ -86,6 +87,12 @@ def nearest_distance(lat, lng, points):
     return min(haversine(lat, lng, p["lat"], p["lng"]) for p in points)
 
 
+def nearest_point(lat, lng, points):
+    if not points:
+        return None
+    return min(points, key=lambda point: haversine(lat, lng, point["lat"], point["lng"]))
+
+
 def load_cache():
     if CACHE.exists():
         return json.loads(CACHE.read_text(encoding="utf-8"))
@@ -138,6 +145,36 @@ def representative_point(rows, name_key, address_key, district, prefix, cache):
     return None
 
 
+def load_osm_bus_stops():
+    if not OSM_BUS_STOPS.exists():
+        return []
+    payload = json.loads(OSM_BUS_STOPS.read_text(encoding="utf-8"))
+    points = []
+    seen = set()
+    for element in payload.get("elements", []):
+        lat = element.get("lat")
+        lng = element.get("lon")
+        if lat is None or lng is None:
+            continue
+        lat = float(lat)
+        lng = float(lng)
+        if not (37.32 <= lat <= 37.49 and 127.07 <= lng <= 127.19):
+            continue
+        key = (round(lat, 7), round(lng, 7))
+        if key in seen:
+            continue
+        seen.add(key)
+        tags = element.get("tags", {})
+        name = strip_text(tags.get("name") or tags.get("ref") or "버스정류장")
+        points.append({
+            "lat": lat,
+            "lng": lng,
+            "name": name,
+            "district": "성남시",
+        })
+    return points
+
+
 def main():
     cache = load_cache()
     population = {strip_text(r["동"]): r for r in read_csv(RAW / "seongnam_population_households.csv")}
@@ -146,6 +183,7 @@ def main():
     pharmacy = read_csv(RAW / "seongnam_pharmacy.csv")
     care_rows = read_csv(RAW / "seongnam_senior_welfare.csv", encoding="cp949")
     garages = read_csv(RAW / "seongnam_bus_garage.csv")
+    bus_stop_points = load_osm_bus_stops()
 
     care_points = []
     for row in care_rows:
@@ -184,13 +222,17 @@ def main():
         med_count = len(rows_for_prefix(medical, "의료기관주소(도로명)", district, prefix))
         pharm_count = len(rows_for_prefix(pharmacy, "약국소재지(도로명)", district, prefix))
         care_dist = nearest_distance(lat, lng, care_points)
-        transit_dist = nearest_distance(lat, lng, garage_points)
+        transit_points = bus_stop_points or garage_points
+        transit_dist = nearest_distance(lat, lng, transit_points)
         med_point = representative_point(medical, "의료기관명", "의료기관주소(도로명)", district, prefix, cache)
         pharm_point = representative_point(pharmacy, "약국명칭", "약국소재지(도로명)", district, prefix, cache)
         if med_point:
             service_points.append({"service_type": "medical", "area_name": area_name, **med_point})
         if pharm_point:
             service_points.append({"service_type": "pharmacy", "area_name": area_name, **pharm_point})
+        bus_point = nearest_point(lat, lng, bus_stop_points)
+        if bus_point:
+            service_points.append({"service_type": "bus", "area_name": area_name, **bus_point})
         metrics_base.append({
             "area_id": area_id,
             "area_name": area_name,
@@ -213,8 +255,9 @@ def main():
         # keep representative welfare points near the selected living areas
         if any(haversine(point["lat"], point["lng"], area["lat"], area["lng"]) < 3.8 for area in metrics_base):
             service_points.append({"service_type": "care", "area_name": "", **point})
-    for point in garage_points:
-        service_points.append({"service_type": "bus", "area_name": "", **point})
+    if not bus_stop_points:
+        for point in garage_points:
+            service_points.append({"service_type": "bus", "area_name": "", **point})
 
     med_counts = [m["medical_count"] for m in metrics_base]
     pharm_counts = [m["pharmacy_count"] for m in metrics_base]
@@ -261,7 +304,7 @@ def main():
             "vulnerable_index": vulnerable_index,
             "selection_note": (
                 f"공식 CSV 기반: 의료 {item['medical_count']}곳, 약국 {item['pharmacy_count']}곳, "
-                f"노인복지관 {item['care_distance_km']:.1f}km, 교통기반시설 {item['transit_distance_km']:.1f}km"
+                f"노인복지관 {item['care_distance_km']:.1f}km, 정류장 {item['transit_distance_km']:.1f}km"
             ),
         })
 

@@ -45,7 +45,7 @@ export function MethodologyDialog({ areas, variant = "v1" }: { areas: AreaMetric
                 <tbody>
                   <tr>
                     <th>서비스</th>
-                    <td>의료기관, 약국, 노인복지관, 공영차고지 좌표 기반 교통 대리 지표</td>
+                    <td>의료기관, 약국, 노인복지관, 실제 버스정류장 좌표</td>
                   </tr>
                   <tr>
                     <th>수요</th>
