@@ -37,8 +37,6 @@
 3. 어디가 우선인가: 접근 어려움과 지원수요의 중첩 확인
 4. 어떻게 보완할까: 데이터 진단과 정책 보완 방향 연결
 
-기존 보존 화면은 [보존 경로](https://seungmin-park-psm1757.github.io/seongnam_10min_access/v1/)에서 확인할 수 있습니다.
-
 ## 재현 방법
 
 ```bash
@@ -69,8 +67,6 @@ node scripts/capture-v2-report.mjs
 - `docs/data_sources.md`: 원천 데이터와 출처 URL
 - `docs/DATA_MAPPING.md`: CSV 컬럼과 전처리 방식
 - `docs/real_data_refresh_execution_prompt.md`: 실제 데이터 갱신 실행 프롬프트
-- `docs/design_v2_notes.md`: 디자인 변경 이유와 전후 포인트
-- `docs/v1_v2_comparison.md`: 기존 화면과 개선 화면 비교
 - `docs/notebooklm_page_update_prompts.md`: 발표자료 페이지별 수정 프롬프트
 
 ## 주요 기술

@@ -397,8 +397,6 @@ export async function DashboardV2() {
           <h1>성남 10분 생활필수 접근권 격차 지도</h1>
         </div>
         <nav aria-label="대시보드 화면 이동">
-          <a href="/v1">v1</a>
-          <a href="/v2">v2</a>
           <a href="#screen-1">한눈에 보기</a>
           <a href="#screen-2">무엇이 부족한가</a>
           <a href="#screen-3">어디가 우선인가</a>

@@ -1,8 +1,8 @@
 {
   "title": "성남 10분 생활필수 접근권 격차 지도 캡처",
-  "appUrl": "http://127.0.0.1:3110/v2/",
-  "capturedAt": "2026-05-12T03:58:49.994Z",
-  "gitCommit": "33e3190",
+  "appUrl": "http://127.0.0.1:3110/",
+  "capturedAt": "2026-05-12T04:03:14.318Z",
+  "gitCommit": "fc93198",
   "viewport": {
     "width": 1920,
     "height": 1080
