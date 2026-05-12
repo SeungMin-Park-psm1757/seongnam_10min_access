@@ -15,7 +15,7 @@ const services = [
     point: "medical",
     label: "의료",
     icon: "+",
-    color: "#2f6f68",
+    color: "#3f4a50",
     basis: "의료기관 거리와 주변 의료 거점 밀도를 본 접근성 지표",
     policy: "동네의원·보건소 연계망을 우선 확인합니다.",
   },
@@ -24,7 +24,7 @@ const services = [
     point: "pharmacy",
     label: "약국",
     icon: "Rx",
-    color: "#52708f",
+    color: "#647077",
     basis: "약국 위치와 의료 거점 연결성을 본 의약품 접근성 지표",
     policy: "공공심야약국 접근성을 점검합니다.",
   },
@@ -33,7 +33,7 @@ const services = [
     point: "bus",
     label: "교통",
     icon: "B",
-    color: "#9a6b2f",
+    color: "#7d8585",
     basis: "실제 버스정류장 좌표와의 거리를 본 접근성 지표",
     policy: "정류장 보행로와 마을버스 배차를 점검합니다.",
   },
@@ -42,7 +42,7 @@ const services = [
     point: "care",
     label: "돌봄",
     icon: "C",
-    color: "#8f4f4f",
+    color: "#96938b",
     basis: "돌봄 거점 위치와 고령·돌봄 수요 관계를 본 지표",
     policy: "찾아가는 복지와 임시 거점 운영을 검토합니다.",
   },
@@ -83,7 +83,7 @@ const policyPlans: Record<
     now: "동네의원·약국·야간/휴일 진료 정보를 정리합니다.",
     mid: "공공보건, 방문상담, 복약 안내를 연계합니다.",
     dept: "보건소, 행정복지센터, 공공의료 협력기관",
-    accent: "#2f6f68",
+    accent: "#59646a",
     emptyInsight: "대표 10개 동에서는 복합 보완 유형에 포함됩니다. 전수 분석에서 단독 유형을 추가 확인합니다.",
   },
   "이동 접근 보완형": {
@@ -93,7 +93,7 @@ const policyPlans: Record<
     now: "정류장 보행동선, 경사, 횡단 안전을 점검합니다.",
     mid: "마을버스 보완과 생활서비스 연결 노선을 검토합니다.",
     dept: "교통기획과, 도로관리부서, 동 행정복지센터",
-    accent: "#9a6b2f",
+    accent: "#6f7777",
     emptyInsight: "대표 10개 동에서는 돌봄·복합 보완과 함께 관찰됩니다. 전수 분석에서 단독 유형을 추가 확인합니다.",
   },
   "돌봄 접근 보완형": {
@@ -103,7 +103,7 @@ const policyPlans: Record<
     now: "찾아가는 돌봄서비스와 행정복지센터 이용 정보를 정비합니다.",
     mid: "임시 거점, 방문상담, 복지 안내체계를 보완합니다.",
     dept: "복지정책과, 노인복지부서, 동 행정복지센터",
-    accent: "#8f4f4f",
+    accent: "#817e76",
     emptyInsight: "현재 대표 표본에서는 돌봄·복합 보완 유형이 우선적으로 관찰됩니다. 단독 돌봄 유형은 전수 분석에서 추가 확인합니다.",
   },
   "복합 보완 필요형": {
@@ -113,7 +113,7 @@ const policyPlans: Record<
     now: "의료·교통·복지 부서가 함께 현장을 점검합니다.",
     mid: "복합 생활서비스 거점 또는 통합 안내체계를 검토합니다.",
     dept: "정책기획과, 보건소, 복지·교통 부서 합동",
-    accent: "#a84f3f",
+    accent: "#414b52",
     emptyInsight: "복합 보완 필요 생활권이 없으면 서비스별 우선 점검 카드로 나눠 검토합니다.",
   },
 };
@@ -157,6 +157,48 @@ function priorityReason(area: AreaMetric) {
   return [
     `종합 ${Math.round(area.overall_score)}점 · ${serviceLabels[key]} ${Math.round(value)}점`,
   ];
+}
+
+const policyHighlightTokens = [
+  "의료·약국",
+  "고령·1인가구",
+  "생활서비스 이동",
+  "정류장",
+  "돌봄 점수",
+  "돌봄수요",
+  "여러 서비스",
+  "지원수요",
+  "동네의원·약국·야간/휴일",
+  "방문상담",
+  "복약 안내",
+  "보행동선",
+  "횡단 안전",
+  "마을버스",
+  "찾아가는 돌봄서비스",
+  "행정복지센터",
+  "임시 거점",
+  "복지 안내체계",
+  "의료·교통·복지",
+  "복합 생활서비스 거점",
+] as const;
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function HighlightedPolicyText({ text }: { text: string }) {
+  const pattern = new RegExp(`(${policyHighlightTokens.map(escapeRegExp).join("|")})`, "g");
+  return (
+    <>
+      {text.split(pattern).map((part, index) =>
+        policyHighlightTokens.includes(part as (typeof policyHighlightTokens)[number]) ? (
+          <strong key={`${part}-${index}`}>{part}</strong>
+        ) : (
+          <span key={`${part}-${index}`}>{part}</span>
+        ),
+      )}
+    </>
+  );
 }
 
 function ServiceTopSummary({ areas, metric }: { areas: AreaMetric[]; metric: MetricKey }) {
@@ -423,15 +465,15 @@ export async function DashboardV2() {
               <dl>
                 <div>
                   <dt>데이터 신호</dt>
-                  <dd>{plan.signal}</dd>
+                  <dd><HighlightedPolicyText text={plan.signal} /></dd>
                 </div>
                 <div>
                   <dt>단기 점검</dt>
-                  <dd>{plan.now}</dd>
+                  <dd><HighlightedPolicyText text={plan.now} /></dd>
                 </div>
                 <div>
                   <dt>중기 검토</dt>
-                  <dd>{plan.mid}</dd>
+                  <dd><HighlightedPolicyText text={plan.mid} /></dd>
                 </div>
               </dl>
             </article>

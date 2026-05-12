@@ -27,10 +27,10 @@ const scoreStops = [
 ] as const;
 
 const serviceColors: Record<ServicePoint["service_type"], string> = {
-  medical: "#2f6f68",
-  pharmacy: "#52708f",
-  bus: "#9a6b2f",
-  care: "#8f4f4f",
+  medical: "#3f4a50",
+  pharmacy: "#647077",
+  bus: "#7d8585",
+  care: "#96938b",
 };
 
 const serviceNames: Record<ServicePoint["service_type"], string> = {
