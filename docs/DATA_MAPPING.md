@@ -33,6 +33,20 @@
 | `district` | 구 이름 |
 | `area_name` | 대표 동과 연결되는 경우 동 이름 |
 
+## `data/processed/accessibility_metrics_audit.csv`
+
+| 컬럼 | 의미 |
+| --- | --- |
+| `medical_count` | 대표 동 주소 문자열에 매핑된 의료기관 수 |
+| `pharmacy_count` | 대표 동 주소 문자열에 매핑된 약국 수 |
+| `nearest_care_distance_km` | 대표 동 중심점에서 가장 가까운 노인복지관까지의 직선거리 |
+| `nearest_bus_stop_distance_km` | 대표 동 중심점에서 가장 가까운 버스정류장까지의 직선거리 |
+| `overall_score` | 화면에 표시되는 종합 접근성 점수 |
+
+## `data/processed/data_manifest.json`
+
+전처리 산출물의 기준을 기록하는 메타데이터 파일이다. 원천 파일명, 기준시점, 출처 URL, 원천 행 수, 산출 일자, 가중치, 점수 구간, 해석상 주의사항을 포함한다.
+
 ## 전처리 메모
 
 - 의료기관·약국은 공공데이터포털 CSV 주소의 구·법정동 문자열을 기준으로 대표 동에 매핑했다.
@@ -48,3 +62,4 @@ python scripts/prepare-official-data.py
 ```
 
 원천 CSV를 같은 파일명으로 갱신한 뒤 위 스크립트를 다시 실행하면 `data/accessibility_metrics.csv`와 `data/service_points.csv`가 재생성된다.
+동시에 `data/processed/accessibility_metrics_audit.csv`와 `data/processed/data_manifest.json`도 함께 갱신된다.

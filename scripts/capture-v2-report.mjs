@@ -1,11 +1,14 @@
 import { mkdirSync, writeFileSync } from "node:fs";
+import { execSync } from "node:child_process";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { chromium } from "playwright";
 
 const appUrl = process.env.APP_URL ?? "http://127.0.0.1:3000/v2/";
+const projectRoot = path.resolve(process.env.REPORT_ROOT ?? process.cwd());
 const outputDir = path.resolve(process.env.REPORT_SCREENSHOT_DIR ?? "public/reports/v2-actual-data-captures");
 const pdfPath = path.resolve(process.env.REPORT_PDF ?? "public/reports/seongnam_10min_access_v2_actual_data_capture.pdf");
+const manifestPath = path.join(outputDir, "capture_manifest.json");
 
 const screens = [
   { id: "screen-1", file: "screen-1.png", title: "화면 1. 한눈에 보기" },
@@ -71,6 +74,29 @@ await pdfPage.pdf({
   margin: { top: "0", right: "0", bottom: "0", left: "0" },
 });
 
+const gitCommit = process.env.GIT_COMMIT ?? (() => {
+  try {
+    return execSync("git rev-parse --short HEAD", { encoding: "utf8" }).trim();
+  } catch {
+    return "unknown";
+  }
+})();
+
+writeFileSync(manifestPath, JSON.stringify({
+  title: "성남 10분 생활필수 접근권 격차 지도 캡처",
+  appUrl,
+  capturedAt: new Date().toISOString(),
+  gitCommit,
+  viewport: { width: 1920, height: 1080 },
+  pdf: path.relative(projectRoot, pdfPath).replaceAll("\\", "/"),
+  screens: screens.map((screen) => ({
+    id: screen.id,
+    title: screen.title,
+    file: path.relative(projectRoot, path.join(outputDir, screen.file)).replaceAll("\\", "/"),
+  })),
+}, null, 2), "utf-8");
+
 await browser.close();
 console.log(`screenshots: ${outputDir}`);
 console.log(`pdf: ${pdfPath}`);
+console.log(`manifest: ${manifestPath}`);

@@ -3,10 +3,11 @@ import { MethodologyDialog } from "@/components/MethodologyDialog";
 import { NeedAccessExplorer } from "@/components/NeedAccessExplorer";
 import { PresentationModeToggle } from "@/components/PresentationModeToggle";
 import { SensitivityToggle } from "@/components/SensitivityToggle";
-import { dataScope, loadDashboardData, type AreaMetric, type ServicePoint } from "@/lib/data";
+import { dataScope, loadDashboardData, type AreaMetric, type DataMetadata, type ServicePoint } from "@/lib/data";
 import type { CSSProperties, ReactNode } from "react";
 
 type MetricKey = "medical_score" | "pharmacy_score" | "transit_score" | "care_score";
+type DiagnosisKind = "의료·의약 접근 취약" | "정류장·보행 연결 취약" | "돌봄 거점 접근 취약" | "복합 점검 필요";
 type PolicyKind = "의료 접근 보완형" | "이동 접근 보완형" | "돌봄 접근 보완형" | "복합 보완 필요형";
 
 const services = [
@@ -136,12 +137,27 @@ function weakestService(area: AreaMetric) {
   return values.reduce((lowest, current) => (current[1] < lowest[1] ? current : lowest));
 }
 
-function policyType(area: AreaMetric): PolicyKind {
-  if (area.overall_score < 58 && area.vulnerable_index >= 70) return "복합 보완 필요형";
+function diagnosisType(area: AreaMetric): DiagnosisKind {
+  if (area.overall_score < 58 && area.vulnerable_index >= 70) return "복합 점검 필요";
   const [key] = weakestService(area);
-  if (key === "medical_score" || key === "pharmacy_score") return "의료 접근 보완형";
-  if (key === "transit_score") return "이동 접근 보완형";
-  return "돌봄 접근 보완형";
+  if (key === "medical_score" || key === "pharmacy_score") return "의료·의약 접근 취약";
+  if (key === "transit_score") return "정류장·보행 연결 취약";
+  return "돌봄 거점 접근 취약";
+}
+
+function policyType(area: AreaMetric): PolicyKind {
+  const diagnosis = diagnosisType(area);
+  if (diagnosis === "의료·의약 접근 취약") return "의료 접근 보완형";
+  if (diagnosis === "정류장·보행 연결 취약") return "이동 접근 보완형";
+  if (diagnosis === "돌봄 거점 접근 취약") return "돌봄 접근 보완형";
+  return "복합 보완 필요형";
+}
+
+function diagnosisForPolicy(kind: PolicyKind): DiagnosisKind {
+  if (kind === "의료 접근 보완형") return "의료·의약 접근 취약";
+  if (kind === "이동 접근 보완형") return "정류장·보행 연결 취약";
+  if (kind === "돌봄 접근 보완형") return "돌봄 거점 접근 취약";
+  return "복합 점검 필요";
 }
 
 function priorityReason(area: AreaMetric) {
@@ -237,10 +253,10 @@ function MetricCardV2({ average }: { average: number }) {
   );
 }
 
-function MethodologyButtonV2({ areas }: { areas: AreaMetric[] }) {
+function MethodologyButtonV2({ areas, metadata }: { areas: AreaMetric[]; metadata: DataMetadata | null }) {
   return (
     <div className="v2-methodology-button">
-      <MethodologyDialog areas={areas} variant="v2" />
+      <MethodologyDialog areas={areas} metadata={metadata} variant="v2" />
     </div>
   );
 }
@@ -345,22 +361,25 @@ function MethodCard({ average, count }: { average: number; count: number }) {
   );
 }
 
-function DataSourceCard() {
+function DataSourceCard({ metadata }: { metadata: DataMetadata | null }) {
+  const sourceCount = metadata?.sources?.filter((source) => source.exists).length ?? 0;
+  const generated = metadata?.generated_at ? new Date(metadata.generated_at).toISOString().slice(0, 10) : "재산출 가능";
+
   return (
     <section className="v2-card sourceCard" aria-label="데이터 출처 요약">
       <p className="eyebrow">데이터</p>
-      <h3 className="v2-card-title">공공데이터로 확장 가능한 구조</h3>
+      <h3 className="v2-card-title">출처와 기준을 남기는 구조</h3>
       <ul>
-        <li>의료기관, 약국, 버스정류장, 복지·돌봄 생활서비스 거점</li>
-        <li>행정동별 인구, 고령층, 1인가구 통계와 돌봄수요 지표</li>
-        <li>동일 컬럼 CSV 교체 시 전체 행정동 전수 분석 가능</li>
+        <li>의료기관, 약국, 버스정류장, 노인복지관 위치와 인구 통계를 결합했습니다.</li>
+        <li>원천 파일 {sourceCount || "다수"}개와 산출 일자 {generated}를 메타데이터로 기록합니다.</li>
+        <li>동일 컬럼 CSV를 교체하면 전체 행정동 분석으로 확장할 수 있습니다.</li>
       </ul>
     </section>
   );
 }
 
 export async function DashboardV2() {
-  const { areas, points } = loadDashboardData("normal");
+  const { areas, points, metadata } = loadDashboardData("normal");
   const priorityTop = sortBy(areas, riskScore, "desc").slice(0, 5);
   const selectedArea = priorityTop[0];
   const average = areas.length > 0 ? Math.round(areas.reduce((sum, area) => sum + area.overall_score, 0) / areas.length) : 0;
@@ -403,7 +422,7 @@ export async function DashboardV2() {
           <MapPanelV2 areas={areas} points={points} metric="overall_score" />
           <aside className="kpiPanel">
             <MetricCardV2 average={areas.length > 0 ? average : 0} />
-            <MethodologyButtonV2 areas={areas} />
+            <MethodologyButtonV2 areas={areas} metadata={metadata} />
             <ScopeCard count={areas.length} />
             <InsightCardV2>
               <h3 className="v2-card-title">우선 점검이 필요한 생활권</h3>
@@ -413,7 +432,7 @@ export async function DashboardV2() {
                     <span>{index + 1}</span>
                     <div>
                       <strong>{area.area_name}</strong>
-                      <LineText className="ko-card-desc priorityReason" lines={priorityReason(area)} />
+                      <LineText className="ko-card-desc priorityReason" lines={[diagnosisType(area), ...priorityReason(area)]} />
                     </div>
                     <em>{policyType(area)}</em>
                   </li>
@@ -423,7 +442,7 @@ export async function DashboardV2() {
             <div className="v2-supporting-cards">
               <MethodCard average={average} count={areas.length} />
               <SensitivityToggle areas={areas} />
-              <DataSourceCard />
+              <DataSourceCard metadata={metadata} />
             </div>
           </aside>
         </div>
@@ -502,6 +521,7 @@ export async function DashboardV2() {
               <div className="policyCardHead">
                 <p>{plan.summary}</p>
                 <h3 className="v2-card-title ko-card-title">{kind}</h3>
+                <span className="policyDiagnosis">데이터 진단: {diagnosisForPolicy(kind)}</span>
               </div>
               <div className="policyAreas">
                 {groupedAreas.length > 0 ? (

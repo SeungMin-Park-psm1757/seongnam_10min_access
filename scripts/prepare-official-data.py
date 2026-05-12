@@ -5,14 +5,75 @@ import re
 import time
 import urllib.parse
 import urllib.request
+from datetime import datetime, timezone
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "raw_official"
 OUT = ROOT / "data"
+PROCESSED = OUT / "processed"
 CACHE = RAW / "geocode_cache.json"
 OSM_BUS_STOPS = RAW / "osm_seongnam_bus_stops.json"
+
+SOURCE_FILES = [
+    {
+        "name": "성남시 의료기관 현황",
+        "file": "seongnam_medical.csv",
+        "period": "2026-03-04",
+        "url": "https://www.data.go.kr/data/15000890/fileData.do",
+        "use": "동별 의료기관 수와 대표 의료 거점 좌표",
+    },
+    {
+        "name": "성남시 약국 현황",
+        "file": "seongnam_pharmacy.csv",
+        "period": "2026-03-04",
+        "url": "https://www.data.go.kr/data/15000848/fileData.do",
+        "use": "동별 약국 수와 대표 약국 좌표",
+    },
+    {
+        "name": "성남시 노인종합복지관 현황",
+        "file": "seongnam_senior_welfare.csv",
+        "period": "2025-06-05",
+        "url": "https://www.data.go.kr/data/15000901/fileData.do",
+        "use": "노인복지관 목록과 돌봄 접근 거리",
+    },
+    {
+        "name": "경기교통정보센터 버스정류소 현황",
+        "file": "gits_seongnam_bus_stop_count_2025.csv",
+        "period": "2025",
+        "url": "https://gits.gg.go.kr/gtdb/web/trafficDb/publicTransport/busStop.do",
+        "use": "성남시 정류소 규모 교차 확인",
+    },
+    {
+        "name": "OpenStreetMap 성남시 버스정류장 노드",
+        "file": "osm_seongnam_bus_stops.json",
+        "period": "2026-05-08 다운로드",
+        "url": "https://overpass-api.de/",
+        "use": "실제 버스정류장 좌표 기반 거리 산정",
+    },
+    {
+        "name": "성남시 인구 및 세대 현황",
+        "file": "seongnam_population_households.csv",
+        "period": "2026-03-31",
+        "url": "https://www.data.go.kr/data/15007386/fileData.do",
+        "use": "인구, 고령층 비율, 세대 규모",
+    },
+    {
+        "name": "성남시 1인세대 현황",
+        "file": "seongnam_single_household.csv",
+        "period": "2025-04-30",
+        "url": "https://www.data.go.kr/data/15061108/fileData.do",
+        "use": "1인가구와 고령 1인가구 비율",
+    },
+    {
+        "name": "성남시 복지시설 좌표 PDF",
+        "file": "seongnam_public_wifi_welfare_coordinates.pdf",
+        "period": "공개 PDF 기준",
+        "url": "https://www.seongnam.go.kr/contents/down/10458_6.pdf",
+        "use": "노인복지관 좌표 보정",
+    },
+]
 
 TARGET_AREAS = [
     ("D001", "태평1동", "수정구", "태평", 37.446, 127.127, 16, 22),
@@ -103,6 +164,32 @@ def save_cache(cache):
     CACHE.write_text(json.dumps(cache, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def raw_row_count(source):
+    path = RAW / source["file"]
+    if not path.exists():
+        return 0
+    if path.suffix.lower() == ".json":
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        return len(payload.get("elements", []))
+    if path.suffix.lower() == ".pdf":
+        return None
+    encoding = "cp949" if source["file"] == "seongnam_senior_welfare.csv" else "utf-8-sig"
+    return len(read_csv(path, encoding=encoding))
+
+
+def source_manifest():
+    records = []
+    for source in SOURCE_FILES:
+        path = RAW / source["file"]
+        records.append({
+            **source,
+            "local_path": str(path.relative_to(ROOT)).replace("\\", "/"),
+            "exists": path.exists(),
+            "rows": raw_row_count(source),
+        })
+    return records
+
+
 def geocode(address, cache):
     if address in cache:
         return cache[address]
@@ -176,6 +263,7 @@ def load_osm_bus_stops():
 
 
 def main():
+    PROCESSED.mkdir(parents=True, exist_ok=True)
     cache = load_cache()
     population = {strip_text(r["동"]): r for r in read_csv(RAW / "seongnam_population_households.csv")}
     singles = {strip_text(r["동별"]): r for r in read_csv(RAW / "seongnam_single_household.csv")}
@@ -268,6 +356,7 @@ def main():
     older_single_ratios = [m["older_single_ratio"] for m in metrics_base]
 
     area_rows = []
+    audit_rows = []
     for item in metrics_base:
         medical_score = minmax_score(item["medical_count"], med_counts, floor=48, ceil=92)
         pharmacy_score = minmax_score(item["pharmacy_count"], pharm_counts, floor=48, ceil=92)
@@ -307,6 +396,26 @@ def main():
                 f"노인복지관 {item['care_distance_km']:.1f}km, 정류장 {item['transit_distance_km']:.1f}km"
             ),
         })
+        audit_rows.append({
+            "area_id": item["area_id"],
+            "area_name": item["area_name"],
+            "district": item["district"],
+            "population": item["population"],
+            "elderly_ratio": item["elderly_ratio"],
+            "single_ratio": item["single_ratio"],
+            "older_single_ratio": item["older_single_ratio"],
+            "medical_count": item["medical_count"],
+            "pharmacy_count": item["pharmacy_count"],
+            "nearest_care_distance_km": round(item["care_distance_km"], 3),
+            "nearest_bus_stop_distance_km": round(item["transit_distance_km"], 3),
+            "care_demand": care_demand,
+            "vulnerable_index": vulnerable_index,
+            "medical_score": medical_score,
+            "pharmacy_score": pharmacy_score,
+            "transit_score": transit_score,
+            "care_score": care_score,
+            "overall_score": round(overall, 1),
+        })
 
     area_fields = [
         "area_id", "area_name", "district", "x", "y", "lat", "lng", "population",
@@ -319,6 +428,18 @@ def main():
         writer.writeheader()
         writer.writerows(area_rows)
 
+    audit_fields = [
+        "area_id", "area_name", "district", "population", "elderly_ratio",
+        "single_ratio", "older_single_ratio", "medical_count", "pharmacy_count",
+        "nearest_care_distance_km", "nearest_bus_stop_distance_km", "care_demand",
+        "vulnerable_index", "medical_score", "pharmacy_score", "transit_score",
+        "care_score", "overall_score",
+    ]
+    with (PROCESSED / "accessibility_metrics_audit.csv").open("w", encoding="utf-8", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=audit_fields)
+        writer.writeheader()
+        writer.writerows(audit_rows)
+
     point_fields = ["service_type", "lat", "lng", "name", "district", "area_name"]
     with (OUT / "service_points.csv").open("w", encoding="utf-8", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=point_fields)
@@ -326,8 +447,48 @@ def main():
         for point in service_points:
             writer.writerow({key: point.get(key, "") for key in point_fields})
 
+    metadata = {
+        "title": "성남 10분 생활필수 접근권 격차 지도",
+        "source_mode": "official_public_data",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "analysis_unit": "대표 생활권 10개 동",
+        "method_version": "official-public-data-2026-05",
+        "outputs": [
+            "data/accessibility_metrics.csv",
+            "data/service_points.csv",
+            "data/processed/accessibility_metrics_audit.csv",
+            "data/processed/data_manifest.json",
+        ],
+        "weights": {
+            "medical_score": 0.30,
+            "pharmacy_score": 0.20,
+            "transit_score": 0.25,
+            "care_score": 0.25,
+        },
+        "score_bands": [
+            {"label": "우선 점검 필요", "range": "0-57"},
+            {"label": "주의 관찰", "range": "58-69"},
+            {"label": "대체로 양호", "range": "70-100"},
+        ],
+        "row_counts": {
+            "areas": len(area_rows),
+            "service_points": len(service_points),
+            "osm_bus_stop_nodes": len(bus_stop_points),
+            "care_points": len(care_points),
+        },
+        "sources": source_manifest(),
+        "notes": [
+            "현재 점수는 위치 기반 근사 접근성 지표입니다.",
+            "보행 네트워크, 경사, 횡단 여건, 실제 이동시간을 결합하면 10분 도달성 지표로 확장할 수 있습니다.",
+            "공모전 민간 통신·카드 데이터는 활용 가능 출처를 확인했지만, 현재 대시보드 CSV 산출에는 직접 반영하지 않았습니다.",
+        ],
+    }
+    (PROCESSED / "data_manifest.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
+
     print(f"wrote {OUT / 'accessibility_metrics.csv'} ({len(area_rows)} areas)")
     print(f"wrote {OUT / 'service_points.csv'} ({len(service_points)} points)")
+    print(f"wrote {PROCESSED / 'accessibility_metrics_audit.csv'}")
+    print(f"wrote {PROCESSED / 'data_manifest.json'}")
 
 
 if __name__ == "__main__":

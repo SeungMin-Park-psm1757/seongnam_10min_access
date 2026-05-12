@@ -1,0 +1,126 @@
+{
+  "title": "성남 10분 생활필수 접근권 격차 지도",
+  "source_mode": "official_public_data",
+  "generated_at": "2026-05-12T03:41:44.140924+00:00",
+  "analysis_unit": "대표 생활권 10개 동",
+  "method_version": "official-public-data-2026-05",
+  "outputs": [
+    "data/accessibility_metrics.csv",
+    "data/service_points.csv",
+    "data/processed/accessibility_metrics_audit.csv",
+    "data/processed/data_manifest.json"
+  ],
+  "weights": {
+    "medical_score": 0.3,
+    "pharmacy_score": 0.2,
+    "transit_score": 0.25,
+    "care_score": 0.25
+  },
+  "score_bands": [
+    {
+      "label": "우선 점검 필요",
+      "range": "0-57"
+    },
+    {
+      "label": "주의 관찰",
+      "range": "58-69"
+    },
+    {
+      "label": "대체로 양호",
+      "range": "70-100"
+    }
+  ],
+  "row_counts": {
+    "areas": 10,
+    "service_points": 36,
+    "osm_bus_stop_nodes": 1904,
+    "care_points": 6
+  },
+  "sources": [
+    {
+      "name": "성남시 의료기관 현황",
+      "file": "seongnam_medical.csv",
+      "period": "2026-03-04",
+      "url": "https://www.data.go.kr/data/15000890/fileData.do",
+      "use": "동별 의료기관 수와 대표 의료 거점 좌표",
+      "local_path": "data/raw_official/seongnam_medical.csv",
+      "exists": true,
+      "rows": 1904
+    },
+    {
+      "name": "성남시 약국 현황",
+      "file": "seongnam_pharmacy.csv",
+      "period": "2026-03-04",
+      "url": "https://www.data.go.kr/data/15000848/fileData.do",
+      "use": "동별 약국 수와 대표 약국 좌표",
+      "local_path": "data/raw_official/seongnam_pharmacy.csv",
+      "exists": true,
+      "rows": 550
+    },
+    {
+      "name": "성남시 노인종합복지관 현황",
+      "file": "seongnam_senior_welfare.csv",
+      "period": "2025-06-05",
+      "url": "https://www.data.go.kr/data/15000901/fileData.do",
+      "use": "노인복지관 목록과 돌봄 접근 거리",
+      "local_path": "data/raw_official/seongnam_senior_welfare.csv",
+      "exists": true,
+      "rows": 6
+    },
+    {
+      "name": "경기교통정보센터 버스정류소 현황",
+      "file": "gits_seongnam_bus_stop_count_2025.csv",
+      "period": "2025",
+      "url": "https://gits.gg.go.kr/gtdb/web/trafficDb/publicTransport/busStop.do",
+      "use": "성남시 정류소 규모 교차 확인",
+      "local_path": "data/raw_official/gits_seongnam_bus_stop_count_2025.csv",
+      "exists": true,
+      "rows": 1
+    },
+    {
+      "name": "OpenStreetMap 성남시 버스정류장 노드",
+      "file": "osm_seongnam_bus_stops.json",
+      "period": "2026-05-08 다운로드",
+      "url": "https://overpass-api.de/",
+      "use": "실제 버스정류장 좌표 기반 거리 산정",
+      "local_path": "data/raw_official/osm_seongnam_bus_stops.json",
+      "exists": true,
+      "rows": 1905
+    },
+    {
+      "name": "성남시 인구 및 세대 현황",
+      "file": "seongnam_population_households.csv",
+      "period": "2026-03-31",
+      "url": "https://www.data.go.kr/data/15007386/fileData.do",
+      "use": "인구, 고령층 비율, 세대 규모",
+      "local_path": "data/raw_official/seongnam_population_households.csv",
+      "exists": true,
+      "rows": 50
+    },
+    {
+      "name": "성남시 1인세대 현황",
+      "file": "seongnam_single_household.csv",
+      "period": "2025-04-30",
+      "url": "https://www.data.go.kr/data/15061108/fileData.do",
+      "use": "1인가구와 고령 1인가구 비율",
+      "local_path": "data/raw_official/seongnam_single_household.csv",
+      "exists": true,
+      "rows": 50
+    },
+    {
+      "name": "성남시 복지시설 좌표 PDF",
+      "file": "seongnam_public_wifi_welfare_coordinates.pdf",
+      "period": "공개 PDF 기준",
+      "url": "https://www.seongnam.go.kr/contents/down/10458_6.pdf",
+      "use": "노인복지관 좌표 보정",
+      "local_path": "data/raw_official/seongnam_public_wifi_welfare_coordinates.pdf",
+      "exists": true,
+      "rows": null
+    }
+  ],
+  "notes": [
+    "현재 점수는 위치 기반 근사 접근성 지표입니다.",
+    "보행 네트워크, 경사, 횡단 여건, 실제 이동시간을 결합하면 10분 도달성 지표로 확장할 수 있습니다.",
+    "공모전 민간 통신·카드 데이터는 활용 가능 출처를 확인했지만, 현재 대시보드 CSV 산출에는 직접 반영하지 않았습니다."
+  ]
+}

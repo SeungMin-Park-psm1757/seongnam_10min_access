@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import type { AreaMetric } from "@/lib/data";
+import type { AreaMetric, DataMetadata } from "@/lib/data";
 
 const thresholds = {
   lowMax: 57,
@@ -16,10 +16,19 @@ function bandCounts(areas: AreaMetric[]) {
   };
 }
 
-export function MethodologyDialog({ areas, variant = "v1" }: { areas: AreaMetric[]; variant?: "v1" | "v2" }) {
+export function MethodologyDialog({
+  areas,
+  metadata,
+  variant = "v1",
+}: {
+  areas: AreaMetric[];
+  metadata?: DataMetadata | null;
+  variant?: "v1" | "v2";
+}) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const counts = bandCounts(areas);
   const isV2 = variant === "v2";
+  const sources = metadata?.sources?.filter((source) => source.exists).slice(0, 5) ?? [];
 
   return (
     <section className="methodologyDialogLauncher" aria-label="점수 산식과 데이터 출처 확인">
@@ -71,6 +80,7 @@ export function MethodologyDialog({ areas, variant = "v1" }: { areas: AreaMetric
                   <dd>고령층, 1인가구, 돌봄수요를 0~100점으로 표준화해 결합</dd>
                 </div>
               </dl>
+              <p>접근성은 서비스가 가까이 있고 일상적으로 이용하기 쉬운지를 보는 상대 점수입니다.</p>
             </article>
 
             <article>
@@ -102,6 +112,28 @@ export function MethodologyDialog({ areas, variant = "v1" }: { areas: AreaMetric
             <article>
               <h4>데이터 갱신 가능성</h4>
               <p>동일한 CSV 컬럼으로 최신 공공데이터를 교체하면 지도, 차트, 우선순위 카드가 같은 구조로 갱신됩니다.</p>
+            </article>
+
+            <article className="methodologyWide">
+              <h4>출처와 기준시점</h4>
+              <table className="methodSourceTable">
+                <tbody>
+                  {sources.map((source) => (
+                    <tr key={source.file}>
+                      <th>{source.name.replace("성남시 ", "")}</th>
+                      <td>
+                        {source.period} · {source.use}
+                      </td>
+                    </tr>
+                  ))}
+                  {sources.length === 0 ? (
+                    <tr>
+                      <th>출처</th>
+                      <td>데이터 메타데이터 파일을 생성하면 출처와 기준시점이 함께 표시됩니다.</td>
+                    </tr>
+                  ) : null}
+                </tbody>
+              </table>
             </article>
           </div>
         ) : (

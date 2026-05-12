@@ -36,11 +36,37 @@ export type DataIssue = {
   message: string;
 };
 
+export type DataSourceRecord = {
+  name: string;
+  file: string;
+  period: string;
+  url: string;
+  use: string;
+  local_path: string;
+  exists: boolean;
+  rows: number | null;
+};
+
+export type DataMetadata = {
+  title: string;
+  source_mode: string;
+  generated_at: string;
+  analysis_unit: string;
+  method_version: string;
+  outputs: string[];
+  weights: Record<string, number>;
+  score_bands: { label: string; range: string }[];
+  row_counts: Record<string, number>;
+  sources: DataSourceRecord[];
+  notes: string[];
+};
+
 export type DashboardData = {
   areas: AreaMetric[];
   points: ServicePoint[];
   issues: DataIssue[];
   source: "csv" | "sample" | "empty" | "error";
+  metadata: DataMetadata | null;
 };
 
 export type LoadScenario = "normal" | "empty" | "error";
@@ -280,6 +306,10 @@ function csvPath(fileName: string) {
   return path.join(process.cwd(), "data", fileName);
 }
 
+function metadataPath() {
+  return path.join(process.cwd(), "data", "processed", "data_manifest.json");
+}
+
 function parseCsv(content: string) {
   const rows: string[][] = [];
   let cell = "";
@@ -322,6 +352,16 @@ function readCsvObjects(fileName: string) {
   return rows.map((row) =>
     Object.fromEntries(headers.map((header, index) => [header.trim(), row[index]?.trim() ?? ""])),
   );
+}
+
+function readDataMetadata(): DataMetadata | null {
+  const fullPath = metadataPath();
+  if (!existsSync(fullPath)) return null;
+  try {
+    return JSON.parse(readFileSync(fullPath, "utf8")) as DataMetadata;
+  } catch {
+    return null;
+  }
 }
 
 function numberValue(value: unknown, fallback = 0) {
@@ -367,12 +407,14 @@ export function calculateWeightedScore(
 }
 
 export function loadDashboardData(scenario: LoadScenario = "normal"): DashboardData {
+  const metadata = readDataMetadata();
   if (scenario === "empty") {
     return {
       areas: [],
       points: [],
       issues: [{ severity: "info", message: "표시할 CSV 데이터가 없습니다." }],
       source: "empty",
+      metadata,
     };
   }
 
@@ -382,6 +424,7 @@ export function loadDashboardData(scenario: LoadScenario = "normal"): DashboardD
       points: [],
       issues: [{ severity: "error", message: "좌표 또는 점수 오류가 있습니다." }],
       source: "error",
+      metadata,
     };
   }
 
@@ -468,5 +511,6 @@ export function loadDashboardData(scenario: LoadScenario = "normal"): DashboardD
     points,
     issues,
     source: areaRows.length > 0 ? "csv" : "sample",
+    metadata,
   };
 }
