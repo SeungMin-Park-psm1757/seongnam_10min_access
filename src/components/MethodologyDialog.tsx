@@ -49,7 +49,7 @@ export function MethodologyDialog({
         {isV2 ? (
           <div className="methodologyGrid methodologyGridV2">
             <article>
-              <h4>사용 데이터</h4>
+              <h4>데이터 출처 요약</h4>
               <table className="methodSourceTable">
                 <tbody>
                   <tr>
@@ -73,7 +73,7 @@ export function MethodologyDialog({
               <dl className="formulaList formulaCards">
                 <div>
                   <dt>종합 접근성</dt>
-                  <dd>의료 30% + 약국 20% + 교통 25% + 돌봄 25%</dd>
+                  <dd>서비스별 접근성 점수를 0~100점으로 표준화해 합산</dd>
                 </div>
                 <div>
                   <dt>지원수요</dt>
@@ -81,6 +81,17 @@ export function MethodologyDialog({
                 </div>
               </dl>
               <p>접근성은 서비스가 가까이 있고 일상적으로 이용하기 쉬운지를 보는 상대 점수입니다.</p>
+            </article>
+
+            <article>
+              <h4>가중치</h4>
+              <dl className="formulaList formulaCards">
+                <div>
+                  <dt>종합 접근성 구성</dt>
+                  <dd>의료 30% + 약국 20% + 교통 25% + 돌봄 25%</dd>
+                </div>
+              </dl>
+              <p>의료와 교통은 긴급성과 이동성이 커 비중을 조금 높였습니다.</p>
             </article>
 
             <article>
@@ -100,18 +111,18 @@ export function MethodologyDialog({
             </article>
 
             <article>
-              <h4>대표 동 선정 기준</h4>
-              <p>고령층 비중, 1인가구 비중, 생활서비스 접근 편차, 수정·중원·분당 권역 대표성을 함께 반영했습니다.</p>
+              <h4>민감도 분석</h4>
+              <p>의료, 약국, 교통, 돌봄 비중을 바꿔도 우선 확인 후보가 크게 흔들리지 않는지 확인할 수 있도록 구성했습니다.</p>
             </article>
 
             <article>
-              <h4>한계와 확장</h4>
-              <p>현재 점수는 위치 기반 근사 접근성입니다. 정류장 좌표, 보행 네트워크, 실제 이동시간 데이터를 결합하면 10분 도달성 지표로 확장할 수 있습니다.</p>
+              <h4>개인정보 비식별·집계</h4>
+              <p>현재 화면은 공개 위치자료와 동별 집계 통계를 사용합니다. 개인 단위 이동 기록이나 식별정보는 사용하지 않습니다.</p>
             </article>
 
             <article>
-              <h4>데이터 갱신 가능성</h4>
-              <p>동일한 CSV 컬럼으로 최신 공공데이터를 교체하면 지도, 차트, 우선순위 카드가 같은 구조로 갱신됩니다.</p>
+              <h4>확장 가능성</h4>
+              <p>정류장 좌표, 보행 네트워크, 실제 이동시간 데이터를 결합하면 10분 도달성 지표로 확장할 수 있습니다.</p>
             </article>
 
             <article className="methodologyWide">

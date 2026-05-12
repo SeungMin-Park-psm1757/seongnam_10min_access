@@ -48,7 +48,7 @@ export function NeedAccessExplorer({ areas, initialAreaId, policyTypes, weakestS
 
   const compactSelectionNote = compactSelectionNotes[selected.area_id] ?? selected.selection_note;
   const isV2 = variant === "v2";
-  const profileSummary = `${weakestServices[selected.area_id]} 접근을 먼저 확인할 생활권입니다.`;
+  const profileSummary = "우선 점검 후보";
 
   return (
     <div className={isV2 ? "needAccessGrid needAccessGridV2" : "needAccessGrid"}>
@@ -63,8 +63,8 @@ export function NeedAccessExplorer({ areas, initialAreaId, policyTypes, weakestS
           X축은 100에서 종합 접근권 점수를 뺀 값이고, Y축은 고령층, 1인가구, 돌봄수요를 결합한 지원수요입니다.
           원 크기는 인구 규모, 색상과 라벨은 정책 보완 유형을 뜻합니다.
         </p>
-        <span className="axis x">{isV2 ? "X축: 접근이 어려울수록 →" : "X축: 10분 접근 어려움 = 100 - 종합 접근권"}</span>
-        <span className="axis y">{isV2 ? "Y축: 지원수요가 높을수록 ↑" : "Y축: 지원수요 = 고령·1인가구·돌봄수요"}</span>
+        <span className="axis x">{isV2 ? "접근 어려움 →" : "X축: 10분 접근 어려움 = 100 - 종합 접근권"}</span>
+        <span className="axis y">{isV2 ? "지원수요 ↑" : "Y축: 지원수요 = 고령·1인가구·돌봄수요"}</span>
         {!isV2 && (
           <div className="scatterFormulaNote">
             원 크기: 인구 규모 · 색상: 정책 보완 유형
@@ -81,7 +81,7 @@ export function NeedAccessExplorer({ areas, initialAreaId, policyTypes, weakestS
           const isSelected = area.area_id === selected.area_id;
           const isPriority = policyTypes[area.area_id] === "복합 보완 필요형";
           const dotSize = clamp(30 + (area.population / maxPopulation) * 22, 34, 54);
-          const shouldLabel = !isV2 || isSelected || isPriority || area.area_id === "D007";
+          const shouldLabel = !isV2 || isSelected || isPriority;
           const title = [
             `${area.area_name}`,
             `종합 접근권 ${Math.round(area.overall_score)}점`,
@@ -136,6 +136,7 @@ export function NeedAccessExplorer({ areas, initialAreaId, policyTypes, weakestS
                 <strong>{weakestServices[selected.area_id]}</strong>
               </div>
             </div>
+            <p className="profileInterpretation">우선 확인 분야: {weakestServices[selected.area_id]}</p>
             <p className="profileInterpretation">{compactSelectionNote}</p>
             <div className="profileBars demandBars" aria-label="지원수요 구성 지표">
               {[
@@ -195,6 +196,9 @@ export function NeedAccessExplorer({ areas, initialAreaId, policyTypes, weakestS
           </>
         )}
       </aside>
+      {isV2 ? (
+        <p className="scatterFootnote">색상은 정책 보완 유형, 원 크기는 인구 규모를 나타냅니다.</p>
+      ) : null}
     </div>
   );
 }
