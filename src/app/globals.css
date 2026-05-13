@@ -1985,29 +1985,60 @@ th {
 
 .v2-page .scatterDot.selected {
   z-index: 7;
-  min-width: 78px;
-  border: 2px solid #a64d3f;
-  background: #fffdf8;
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  min-height: 52px;
+  border: 3px solid #102a43;
+  border-radius: 999px;
+  background: #a64d3f;
   color: #102a43;
-  padding: 8px 12px;
+  padding: 0;
   box-shadow:
     0 0 0 12px rgba(166, 77, 63, 0.18),
     0 10px 24px rgba(20, 36, 49, 0.18);
 }
 
-.v2-page .scatterDot.selected::after {
+.v2-page .scatterDot.selected::before {
+  position: absolute;
+  inset: 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  content: "";
+  z-index: 0;
+}
+
+.v2-page .scatterDot.selected span,
+.v2-page .scatterDot.hovered span {
   position: absolute;
   left: 50%;
-  bottom: -28px;
-  width: 48px;
-  height: 48px;
+  bottom: calc(100% + 12px);
+  display: inline-flex;
+  min-width: 68px;
+  justify-content: center;
   transform: translateX(-50%);
-  border: 3px solid #102a43;
+  border: 2px solid #a64d3f;
+  border-radius: 8px;
+  background: #fffdf8;
+  padding: 7px 10px;
+  color: #102a43;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.1;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 8px 18px rgba(20, 36, 49, 0.16);
+  z-index: 2;
+}
+
+.v2-page .scatterDot.hovered:not(.selected) {
+  width: var(--dot-size, 38px);
+  height: var(--dot-size, 38px);
+  min-width: var(--dot-size, 38px);
+  min-height: var(--dot-size, 38px);
   border-radius: 999px;
-  background: #a64d3f;
-  box-shadow: 0 0 0 10px rgba(166, 77, 63, 0.18);
-  content: "";
-  z-index: -1;
+  background: var(--dot-color, #7b8a72);
+  padding: 0;
 }
 
 .v2-page .profileCard {

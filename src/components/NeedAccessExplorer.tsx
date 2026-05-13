@@ -61,7 +61,7 @@ export function NeedAccessExplorer({ areas, initialAreaId, policyTypes, weakestS
 
   const compactSelectionNote = compactSelectionNotes[active.area_id] ?? active.selection_note;
   const isV2 = variant === "v2";
-  const profileSummary = hoveredId ? "마우스오버 생활권" : "우선 점검 후보";
+  const profileSummary = hoveredId && hoveredId !== selectedId ? "마우스오버 생활권" : "우선 점검 후보";
 
   return (
     <div className={isV2 ? "needAccessGrid needAccessGridV2" : "needAccessGrid"}>
@@ -103,6 +103,7 @@ export function NeedAccessExplorer({ areas, initialAreaId, policyTypes, weakestS
               key={area.area_id}
               type="button"
               className={`scatterDot ${isSelected ? "selected" : ""} ${isHovered ? "hovered" : ""} ${isPriority ? "priority" : ""} ${isTargetZone ? "target-zone-dot" : ""} ${shouldLabel ? "" : "unlabeled"}`}
+              data-area-id={area.area_id}
               data-policy={policyTypes[area.area_id]}
               style={{ left: `${x}%`, bottom: `${y}%`, "--dot-size": `${dotSize}px` } as CSSProperties}
               onClick={() => setSelectedId(area.area_id)}
