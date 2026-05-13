@@ -74,10 +74,10 @@ export function NeedAccessExplorer({ areas, initialAreaId, policyTypes, weakestS
       >
         <p id="scatter-desc" className="srOnly">
           X축은 100에서 종합 접근권 점수를 뺀 값이고, Y축은 고령층, 1인가구, 돌봄수요를 결합한 지원수요입니다.
-          화면 좌표는 대표 생활권 안의 상대적 위치로 정규화해 보여주며, 원 크기는 인구 규모를 뜻합니다.
+          화면 좌표는 대표 생활권 안의 상대적 위치로 보여주며, 원 크기는 인구 규모를 뜻합니다.
         </p>
-        <span className="axis x">{isV2 ? "접근 어려움 →" : "X축: 10분 접근 어려움 = 100 - 종합 접근권"}</span>
-        <span className="axis y">{isV2 ? "지원수요 ↑" : "Y축: 지원수요 = 고령·1인가구·돌봄수요"}</span>
+        <span className="axis x">{isV2 ? "접근이 어려울수록 →" : "X축: 10분 접근 어려움 = 100 - 종합 접근권"}</span>
+        <span className="axis y">{isV2 ? "지원수요가 높을수록 ↑" : "Y축: 지원수요 = 고령·1인가구·돌봄수요"}</span>
         {!isV2 && (
           <div className="scatterFormulaNote">
             원 크기: 인구 규모 · 색상: 정책 보완 유형
@@ -94,14 +94,15 @@ export function NeedAccessExplorer({ areas, initialAreaId, policyTypes, weakestS
           const isSelected = area.area_id === selected.area_id;
           const isHovered = area.area_id === hoveredId;
           const isPriority = policyTypes[area.area_id] === "복합 보완 필요형";
-          const dotSize = clamp(30 + (area.population / maxPopulation) * 22, 34, 54);
+          const isTargetZone = accessGap >= 30 && area.vulnerable_index >= 70;
+          const dotSize = clamp(26 + (area.population / maxPopulation) * 18, 30, 44);
           const shouldLabel = !isV2 || isSelected || isHovered || isPriority;
 
           return (
             <button
               key={area.area_id}
               type="button"
-              className={`scatterDot ${isSelected ? "selected" : ""} ${isHovered ? "hovered" : ""} ${isPriority ? "priority" : ""} ${shouldLabel ? "" : "unlabeled"}`}
+              className={`scatterDot ${isSelected ? "selected" : ""} ${isHovered ? "hovered" : ""} ${isPriority ? "priority" : ""} ${isTargetZone ? "target-zone-dot" : ""} ${shouldLabel ? "" : "unlabeled"}`}
               data-policy={policyTypes[area.area_id]}
               style={{ left: `${x}%`, bottom: `${y}%`, "--dot-size": `${dotSize}px` } as CSSProperties}
               onClick={() => setSelectedId(area.area_id)}
@@ -147,13 +148,17 @@ export function NeedAccessExplorer({ areas, initialAreaId, policyTypes, weakestS
             </div>
             <p className="profileInterpretation">우선 확인 분야: {weakestServices[active.area_id]}</p>
             <p className="profileInterpretation">{compactSelectionNote}</p>
+            <p className="profileSummaryText">
+              {active.area_name}은 종합 접근성 {Math.round(active.overall_score)}점, 접근 어려움 {Math.round(100 - active.overall_score)}점,
+              지원수요 {active.vulnerable_index}점으로 나타나 {weakestServices[active.area_id]} 접근을 먼저 확인할 생활권입니다.
+            </p>
             <div className="profileBars demandBars" aria-label="지원수요 구성 지표">
               {[
                 ["고령층", active.elderly_ratio],
                 ["1인가구", active.single_ratio],
                 ["돌봄수요", active.care_demand],
               ].map(([label, score]) => (
-                <div key={label}>
+                <div key={label} className={label === "돌봄수요" ? "careDemandBar" : undefined}>
                   <span>{label}</span>
                   <i style={{ width: `${Number(score)}%` }} />
                   <em>{Math.round(Number(score))}</em>

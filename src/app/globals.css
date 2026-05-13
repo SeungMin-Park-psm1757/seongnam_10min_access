@@ -1853,24 +1853,40 @@ th {
 
 .v2-page .scatterPlot,
 .v2-page .matrix {
-  min-height: 620px;
+  min-height: 660px;
   border-radius: 8px;
   box-shadow: none;
   background-size: 25% 25%;
 }
 
 .v2-page .scatterPlotV2 {
-  background-color: #fbfaf6;
-  background-size: 50% 50%;
+  background:
+    linear-gradient(to right, transparent 50%, rgba(166, 77, 63, 0.1) 50%) top / 100% 50% no-repeat,
+    linear-gradient(90deg, rgba(20, 36, 49, 0.06) 1px, transparent 1px),
+    linear-gradient(rgba(20, 36, 49, 0.06) 1px, transparent 1px),
+    #fffefa;
+  background-size: 100% 50%, 25% 25%, 25% 25%, auto;
+}
+
+.v2-page .scatterPlot::before,
+.v2-page .matrix::before {
+  background: #b8c0c2;
+}
+
+.v2-page .scatterPlot::after,
+.v2-page .matrix::after {
+  background: #b8c0c2;
 }
 
 .v2-page .axis {
   max-width: 320px;
-  border: 1px solid rgba(19, 38, 53, 0.12);
+  border: 1px solid rgba(19, 38, 53, 0.16);
   border-radius: 8px;
-  background: rgba(255, 254, 250, 0.86);
-  padding: 8px 10px;
-  font-size: 13px;
+  background: rgba(255, 254, 250, 0.94);
+  padding: 9px 11px;
+  color: #253942;
+  font-size: 15px;
+  font-weight: 820;
   line-height: 1.45;
 }
 
@@ -1900,6 +1916,19 @@ th {
 .v2-page .targetZone {
   top: 24px;
   right: 24px;
+  border: 1px solid rgba(166, 77, 63, 0.35);
+  background: rgba(166, 77, 63, 0.1);
+  color: #9b4438;
+  padding: 14px 16px;
+}
+
+.v2-page .targetZone strong {
+  font-size: 17px;
+}
+
+.v2-page .targetZone span {
+  font-size: 13px;
+  font-weight: 820;
 }
 
 .v2-page .scatterDot.unlabeled {
@@ -1907,13 +1936,12 @@ th {
   height: var(--dot-size, 38px);
   min-width: 0;
   min-height: 0;
-  border: 1.5px solid rgba(55, 76, 78, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.96);
   border-radius: 999px;
-  background:
-    radial-gradient(circle at 36% 32%, rgba(255, 255, 255, 0.72) 0 18%, transparent 19%),
-    rgba(94, 124, 119, 0.36);
+  background: var(--dot-color, #7b8a72);
   padding: 0;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.56);
+  opacity: 0.86;
+  box-shadow: 0 8px 18px rgba(20, 36, 49, 0.12);
 }
 
 .v2-page .scatterDot.unlabeled span {
@@ -1921,10 +1949,25 @@ th {
 }
 
 .v2-page .scatterDot[data-policy="의료 접근 보완형"],
-.v2-page .scatterDot[data-policy="이동 접근 보완형"],
-.v2-page .scatterDot[data-policy="돌봄 접근 보완형"],
-.v2-page .scatterDot[data-policy="복합 보완 필요형"] {
-  border-color: rgba(19, 38, 53, 0.32);
+.v2-page .scatterDot[data-policy="의료 접근 보완형"].unlabeled {
+  --dot-color: #256b63;
+}
+
+.v2-page .scatterDot[data-policy="이동 접근 보완형"].unlabeled {
+  --dot-color: #a98224;
+}
+
+.v2-page .scatterDot[data-policy="돌봄 접근 보완형"].unlabeled {
+  --dot-color: #a64d3f;
+}
+
+.v2-page .scatterDot[data-policy="복합 보완 필요형"].unlabeled {
+  --dot-color: #4f6d86;
+}
+
+.v2-page .scatterDot.target-zone-dot.unlabeled {
+  opacity: 0.96;
+  box-shadow: 0 10px 24px rgba(20, 36, 49, 0.18);
 }
 
 .v2-page .scatterDot.hovered {
@@ -1936,25 +1979,45 @@ th {
 
 .v2-page .scatterDot.priority {
   border-color: #132635;
-  background: #132635;
+  background: #4f6d86;
   color: #fffdf8;
 }
 
 .v2-page .scatterDot.selected {
-  border-color: #132635;
-  background: #132635;
-  color: #fffdf8;
-  outline: 5px solid rgba(19, 38, 53, 0.18);
+  z-index: 7;
+  min-width: 78px;
+  border: 2px solid #a64d3f;
+  background: #fffdf8;
+  color: #102a43;
+  padding: 8px 12px;
+  box-shadow:
+    0 0 0 12px rgba(166, 77, 63, 0.18),
+    0 10px 24px rgba(20, 36, 49, 0.18);
+}
+
+.v2-page .scatterDot.selected::after {
+  position: absolute;
+  left: 50%;
+  bottom: -28px;
+  width: 48px;
+  height: 48px;
+  transform: translateX(-50%);
+  border: 3px solid #102a43;
+  border-radius: 999px;
+  background: #a64d3f;
+  box-shadow: 0 0 0 10px rgba(166, 77, 63, 0.18);
+  content: "";
+  z-index: -1;
 }
 
 .v2-page .profileCard {
   align-content: start;
-  padding: 32px;
+  padding: 36px;
 }
 
 .v2-page .profileCard h3 {
   margin-bottom: 18px;
-  font-size: 58px;
+  font-size: 60px;
   line-height: 1.05;
 }
 
@@ -1983,7 +2046,7 @@ th {
 }
 
 .v2-page .profileCardV2 {
-  gap: 22px;
+  gap: 20px;
 }
 
 .v2-page .profileHero {
@@ -2025,7 +2088,7 @@ th {
   border: 1px solid rgba(19, 38, 53, 0.12);
   border-radius: 8px;
   background: #fbf8f1;
-  padding: 14px;
+  padding: 16px;
 }
 
 .v2-page .profileMetricGrid span {
@@ -2035,7 +2098,7 @@ th {
 
 .v2-page .profileMetricGrid strong {
   color: var(--v2-ink);
-  font-size: 20px;
+  font-size: 22px;
   line-height: 1.35;
 }
 
@@ -2045,8 +2108,24 @@ th {
   padding-left: 12px;
 }
 
+.v2-page .profileSummaryText {
+  margin: 0;
+  color: #203541;
+  font-size: 15.5px;
+  font-weight: 680;
+  line-height: 1.72;
+}
+
 .v2-page .demandBars div {
   grid-template-columns: 58px 1fr 34px;
+}
+
+.v2-page .demandBars i {
+  background: linear-gradient(90deg, #2f6f68, #83a79d);
+}
+
+.v2-page .demandBars .careDemandBar i {
+  background: linear-gradient(90deg, #a64d3f, #c77b68);
 }
 
 .v2-page .scatterFootnote {
