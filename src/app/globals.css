@@ -1468,13 +1468,16 @@ th {
   margin: 0;
   color: var(--v2-ink);
   font-size: 50px;
+  font-weight: 840;
   line-height: 1.12;
   letter-spacing: 0;
+  text-wrap: balance;
 }
 
 .v2-page .prioritySectionTitle .v2-title {
   max-width: 1180px;
   font-size: 42px;
+  font-weight: 830;
   white-space: normal;
 }
 
@@ -1484,7 +1487,7 @@ th {
   margin-top: 16px;
   color: #415157;
   font-size: 18px;
-  font-weight: 560;
+  font-weight: 620;
   line-height: 1.78;
   letter-spacing: 0;
 }
@@ -1509,6 +1512,7 @@ th {
   margin-bottom: 14px;
   color: var(--v2-ink);
   font-size: 20px;
+  font-weight: 850;
   line-height: 1.38;
   letter-spacing: 0;
 }
@@ -1523,6 +1527,7 @@ th {
   padding: 12px 15px;
   color: #285f5b;
   font-size: 16px;
+  font-weight: 740;
   line-height: 1.62;
   letter-spacing: 0;
 }
@@ -1532,7 +1537,7 @@ th {
 }
 
 .v2-page .v2-hero .v2-title {
-  font-weight: 860;
+  font-weight: 880;
   line-height: 1.16;
 }
 
@@ -2319,7 +2324,7 @@ th {
     line-height: 1.1;
   }
 
-.v2-page .serviceScreen .v2-title {
+  .v2-page .serviceScreen .v2-title {
     font-size: 34px;
   }
 
