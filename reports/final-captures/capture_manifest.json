@@ -1,0 +1,33 @@
+{
+  "title": "성남 10분 생활필수 접근권 격차 지도 최종 캡처",
+  "appUrl": "http://127.0.0.1:3110/v2/",
+  "capturedAt": "2026-05-13T02:05:49.698Z",
+  "gitCommit": "3f0dc66",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "pdf": "public/reports/seongnam_10min_access_final_capture.pdf",
+  "screens": [
+    {
+      "id": "screen-1",
+      "title": "화면 1. 한눈에 보기",
+      "file": "public/reports/final-captures/screen-1.png"
+    },
+    {
+      "id": "screen-2",
+      "title": "화면 2. 무엇이 부족한가",
+      "file": "public/reports/final-captures/screen-2.png"
+    },
+    {
+      "id": "screen-3",
+      "title": "화면 3. 어디가 우선인가",
+      "file": "public/reports/final-captures/screen-3.png"
+    },
+    {
+      "id": "screen-4",
+      "title": "화면 4. 어떻게 보완할까",
+      "file": "public/reports/final-captures/screen-4.png"
+    }
+  ]
+}
