@@ -1860,6 +1860,7 @@ th {
 }
 
 .v2-page .scatterPlotV2 {
+  background-color: #fbfaf6;
   background-size: 50% 50%;
 }
 
@@ -1906,9 +1907,13 @@ th {
   height: var(--dot-size, 38px);
   min-width: 0;
   min-height: 0;
+  border: 1.5px solid rgba(55, 76, 78, 0.5);
   border-radius: 999px;
-  background: rgba(255, 254, 250, 0.72);
+  background:
+    radial-gradient(circle at 36% 32%, rgba(255, 255, 255, 0.72) 0 18%, transparent 19%),
+    rgba(94, 124, 119, 0.36);
   padding: 0;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.56);
 }
 
 .v2-page .scatterDot.unlabeled span {
@@ -1930,11 +1935,15 @@ th {
 }
 
 .v2-page .scatterDot.priority {
-  background: #3f4a50;
+  border-color: #132635;
+  background: #132635;
   color: #fffdf8;
 }
 
 .v2-page .scatterDot.selected {
+  border-color: #132635;
+  background: #132635;
+  color: #fffdf8;
   outline: 5px solid rgba(19, 38, 53, 0.18);
 }
 

@@ -16,6 +16,11 @@ function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
 
+function scaleToPlot(value: number, min: number, max: number, low = 12, high = 88) {
+  if (max <= min) return 50;
+  return clamp(low + ((value - min) / (max - min)) * (high - low), low, high);
+}
+
 const compactSelectionNotes: Record<string, string> = {
   D001: "고령·1인가구 높음",
   D002: "1인가구·교통의존 높음",
@@ -36,6 +41,12 @@ export function NeedAccessExplorer({ areas, initialAreaId, policyTypes, weakestS
   const selected = areas.find((area) => area.area_id === selectedId) ?? areas[0];
   const active = areas.find((area) => area.area_id === hoveredId) ?? selected;
   const maxPopulation = Math.max(...areas.map((area) => area.population), 1);
+  const accessGaps = areas.map((area) => 100 - area.overall_score);
+  const demandValues = areas.map((area) => area.vulnerable_index);
+  const minAccessGap = Math.min(...accessGaps);
+  const maxAccessGap = Math.max(...accessGaps);
+  const minDemand = Math.min(...demandValues);
+  const maxDemand = Math.max(...demandValues);
 
   if (areas.length === 0 || !selected || !active) {
     return (
@@ -63,7 +74,7 @@ export function NeedAccessExplorer({ areas, initialAreaId, policyTypes, weakestS
       >
         <p id="scatter-desc" className="srOnly">
           X축은 100에서 종합 접근권 점수를 뺀 값이고, Y축은 고령층, 1인가구, 돌봄수요를 결합한 지원수요입니다.
-          원 크기는 인구 규모, 색상과 라벨은 정책 보완 유형을 뜻합니다.
+          화면 좌표는 대표 생활권 안의 상대적 위치로 정규화해 보여주며, 원 크기는 인구 규모를 뜻합니다.
         </p>
         <span className="axis x">{isV2 ? "접근 어려움 →" : "X축: 10분 접근 어려움 = 100 - 종합 접근권"}</span>
         <span className="axis y">{isV2 ? "지원수요 ↑" : "Y축: 지원수요 = 고령·1인가구·돌봄수요"}</span>
@@ -78,8 +89,8 @@ export function NeedAccessExplorer({ areas, initialAreaId, policyTypes, weakestS
         </div>
         {areas.map((area) => {
           const accessGap = 100 - area.overall_score;
-          const x = clamp(accessGap + (area.area_id.charCodeAt(3) % 5) - 2, 7, 93);
-          const y = clamp(area.vulnerable_index + (area.area_id.charCodeAt(2) % 7) - 3, 8, 92);
+          const x = scaleToPlot(accessGap, minAccessGap, maxAccessGap);
+          const y = scaleToPlot(area.vulnerable_index, minDemand, maxDemand);
           const isSelected = area.area_id === selected.area_id;
           const isHovered = area.area_id === hoveredId;
           const isPriority = policyTypes[area.area_id] === "복합 보완 필요형";
@@ -195,7 +206,7 @@ export function NeedAccessExplorer({ areas, initialAreaId, policyTypes, weakestS
         )}
       </aside>
       {isV2 ? (
-        <p className="scatterFootnote">점에 마우스를 올리면 오른쪽 프로필이 즉시 바뀝니다. 원 크기는 인구 규모를 나타냅니다.</p>
+        <p className="scatterFootnote">점 위치는 대표 생활권 안의 상대 비교입니다. 마우스를 올리면 오른쪽 프로필이 즉시 바뀝니다.</p>
       ) : null}
     </div>
   );
